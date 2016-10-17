@@ -1,0 +1,1168 @@
+﻿Chapter 1. C++ Basics
+=====================
+
+1.1 Structure of a program
+--------------------------
+
+* Statement:
+    - Smallest independent unit in the language.
+    - Tells the compiler to perform a task.
+    - Terminated by semicolon.
+    - Examples: declaration, assignment and output.
+
+* Expression:
+    - Mathematical that evaluates to a value.
+    - It may consist of values, variables, operators and functions.
+    - Function: collection of statements that are evaluated sequentially.
+
+* Library:
+    - Collection of pre-compiled code packed for reuse in many different
+      programs.
+
+* Processor Directive:
+    - Tell the compiler to perform a special task, i.e., add content of header
+      files to access functionality of specific libraries.
+
+1.2 Comments
+------------
+
+* The sequence of symbols // tell the compiler to ignore everything until the
+  end of the current line.
+
+* Everything between the pair of symbols /* and */ will be ignored.
+
+1.3 A first look at variables, initialization and assignment
+------------------------------------------------------------
+
+* Variables:
+    - Name of a piece of memory that is used to store information.
+    - Usually defined via a declaration statement.
+
+* Assignment:
+    - Operation performed via the = symbols, which assigns r-values to l-values
+      (values with an address in memory).
+
+* Initialization:
+    Variable definition + assignment.
+
+1.3a A first look at cout, cin, endl, the std namespace and using statements
+----------------------------------------------------------------------------
+
+* std::cout
+    - Object of the iostream library.
+    - Used to output text to the console.
+    - Used in conjunction with the output operator <<.
+
+* std::endl
+    - In contrasts to std::cout, std::endl inserts the newline character at the
+      end of the stream.
+
+* Std::cin
+    - Reads input from the console.
+    - Used in conjunction with the input operator <<.
+
+* std namespace:
+    - Everything within the standard library is referenced via the std
+      namespace, i.e., the function cout in the standard library is referred as
+      std::cout
+    - There are different way to refer to the standard library:
+        + Using the explicit namespace qualifier:
+              std::cout << “foo”;
+
+    - Via the "using" declaration statement:
+          using std::cout;      // cout resolves to std::cout
+          cout << “foo”;
+
+    - Via the using directive statement:
+          using namespace std;  // Using the standard library from here on!
+          cout << “foo”;
+
+    - If a using declaration or directive is used within a function, the names
+      in the namespace are only directly accessible within that function.
+
+1.4 First look at functions and return values
+---------------------------------------------
+
+* Function:
+    - Reusable sequence of statements designed to do a particular job.
+    - Can not be defined inside other functions.
+
+* Return value:
+    - The C++ standard explicitly specifies that main() should return an int.
+
+1.4a A first look at function parameters and arguments
+------------------------------------------------------
+
+* Parameter:
+    - Function variable whose value is provided by the caller.
+
+* Argument:
+    - Value passed from the caller to the function.
+
+* Pass by value:
+    - When a function is called, all its parameters are created as variables and
+      the value of each parameter is copied from the matching parameter.
+
+1.4c A first look at local scope
+--------------------------------
+
+* Scope:
+    - Determines who can see and use the variable during the time of it is
+      instantiated.
+
+* Local scope:
+    - Function parameters and variables declared inside the function body.
+    - Local variables are created at the point of definition and destroyed when
+      they go out of scope.
+    - Prevents naming collisions.
+
+1.4d Keywords and naming identifiers
+------------------------------------
+
+* Keyword:
+    - Words (73 in total, up to C++11) with special meanings within the C++
+      language.
+    - Together with operators, define the entire C++ language.
+
+* Identifier:
+    - Name given to a variable, function, class of other object
+
+1.7 Forward declaration and definition
+--------------------------------------
+
+* The compiler read the files sequentially.
+
+* Forward declaration:
+    - Informs the compiler about the existence of an identifier before actually
+      defining the identifier.
+    - Function prototype, consisting of:
+        + return type, name and parameters.
+
+* Declaration:
+    - Statement that defines an identifier and its type.
+
+* Definition:
+    - Implementation or instantiation of an identifier.
+
+1.9 Header files
+----------------
+
+* Typically only contain forward declarations.
+
+* Header guards:
+    - Prevent a given header file to be #included more than once from the same
+      file.
+    - As a rule of thumb, each cpp file should #include all of the header files
+      it needs to compile.
+
+* Header files with and without .h termination:
+    - Use the non .h version of a library if it exist, and access the
+      functionality through the std namespace. If the non .h version does not
+      exist, or if you are creating your own headers, use the .h version.
+
+* Including header files from other directories:
+    - Use the -I option of the g++ compiler followed by the path to the
+      containing directory.
+
+1.10 First look at the processor
+--------------------------------
+
+* Processor:
+    - Can be though as a separated program that runs just before the compiler.
+    - Goes through each file looking for directives.
+
+* Directives:
+    - Specific instructions starting with # and ending with a newline. These
+      directives include:
+        + Includes:
+            : Copy content of the included file into the including fie, at
+              exactly the position where the #include directive appears.
+
+    - Macro defines:
+        + Rule defining how an input sequence is converted into a replacement
+          sequence output.
+        + There are two flavors: object-like (text substitution) and
+          function-like (without text substitution, used for, e.g., conditional
+          compilation).
+
+    - Scope:
+        + Resolved before compilation, from top to bottom and on a file-by-file
+          basis, i.e.,
+            : are only valid from the point of definition to the end of the file
+              where they are defined.
+            : Directives defined in one code file do not have impact on other
+              code files in the same project.
+
+1.10a Header guards
+-------------------
+
+* Conditional compilation directives taking the form:
+      #ifndef UNIQUE_NAME
+      #define UNIQUE_NAME
+      // Your declarations and definitions here
+      #endif
+
+* Do not prevent a header from being included once into different code files:
+    - This can result, for example, in multiple definitions of the same
+      function.
+
+* #pragma once:
+    - Serves the same purpose than a header guard, with the additional benefit
+      of being shorter and less error prone.
+    - Not an official part of C++, therefore not supported by all compilers.
+
+Chapter 2. Variables and Fundamental Data Types
+===============================================
+
+2.1 Fundamental variable definition, initialization and assignment
+------------------------------------------------------------------
+
+* Fundamental data types:
+    - boolean:
+        + bool
+
+    - character:
+        + char, wchar_t, char16_t, char32_t
+
+    - integer:
+        + short, int, long, long long
+
+    - float:
+        + float, double, long double
+
+    - void (no type)
+
+* Variable initialization (NOT assignment!!!):
+    - copy:
+         int var = 5;
+
+    - direct:
+          int var(5);
+
+    - uniform:
+          int var{5};
+        : If empty, {}, set variable to default value (zero or empty depending
+          on its data type).
+
+2.4a Fixed width integers and the unsigned controversy
+------------------------------------------------------
+
+* Signed and unsigned types by size (C99, C++11):
+    - 1 byte:
+        + int8_t, uint8_t
+
+    - 2 bytes:
+        + int16_t, uint16_t
+
+    - 4 bytes:
+        + int32_t, uint32_t
+
+    - 8 bytes:
+        + int64_t, uint64_t
+
+* Part of the standard library, accessible by inclusion of the header cstdint.
+
+2.5 Floating point numbers
+--------------------------
+
+Take the form significand x 10^{exponent}
+
+* Precision:
+    - Defined by the the number of significand digits
+
+* IEEE 754 standard, significands by byte size:
+    - 4 bytes:
+        + 6 - 9, typically 7
+
+    - 8 bytes:
+        + 15 - 18, typically 16
+
+    - 16 bytes:
+        + 33 - 36
+
+2.9 Const, constexpr and symbolic constants
+-------------------------------------------
+
+* Defined with the keyword const before the variable type.
+* Must be initialized while being defined, i.e., can't be changed via
+  assignment.
+* Can be initialized from non-constant variables.
+* Commonly used with function parameters, to:
+    - Show the caller that the function does not change the value of the passed
+      value.
+    - Ensure that the function does not modify the passed value.
+
+* There are two type of constant variables:
+    - Run time constants, defined with const.
+    - Compile time constants, preferably defined with constexpr instead of
+      const.
+
+* Define constants namespace in header file instead of using MACRO-like,
+  constant definitions.
+
+Chapter 3. Operators
+====================
+
+3.3 Increment / decrement operators, and side effects
+-----------------------------------------------------
+
+* Prefix increment / decrement:
+    - The value of x is incremented / decremented and, then, x is evaluated
+      (returned).
+
+* Postfix increment / decrement:
+    - A temporary copy of x is created, the original variable x is incremented /
+      decremented and, finally, the temporary copy is evaluated (returned).
+
+3.4 Sizeof, comma and conditional operators
+-------------------------------------------
+
+* Comma operator (x, y):
+    - Evaluate x then y and, finally, returns value of y.
+    - Only recommended to be used in for loops.
+
+* Conditional operator:
+    - condition ? x : y
+    - Contrary to if / else operators, which evaluate as statements, the
+      conditional operator evaluates as an expression.
+
+Chapter 4. Variable Scope and More Types
+========================================
+
+4.1 Intro
+---------
+
+* Scope:
+    - Determines where a variable is accessible.
+
+* Duration:
+    - Determines where a variable is created and destroyed.
+
+4.2 Local variables, scope and duration
+---------------------------------------
+
+* Local variables have automatic duration:
+    - Are created at the point of definition and destroyed when they exit the
+      block where they were created.
+
+* Local variables have block scope (local scope):
+    - They enter scope at the point of declaration and go out of scope at the
+      end of the block they are defined in.
+
+* Shadowing:
+    - Nested variables in a nested block, hide / shadow variables of the outer
+      block with the same name.
+
+* Variables should be defined with the most limited scope possible.
+
+4.2a Global variables and linkage
+---------------------------------
+
+* Global variables have static duration:
+    - They are created when the program starts and destroyed when it ends.
+
+* Global variables have global scope (“global namespace scope” or “file scope”):
+    - They are visible until the end of the file where they are defined.
+
+* Local variables shadow global variables within the block where the local
+  variables are defined.
+
+* Linkage:
+    - Determines whether multiple instance of an identifier refer to the same
+      variable or not.
+    - Internal variable (with internal linkage):
+    - Defined with the keyword static.
+    - Also referred as static variables.
+    - Can used anywhere within the file they are defined in, but can not be
+      referenced outside the file they exist in.
+
+* External variables (external linkage):
+    - Defined with the keyword extern.
+    - Can be used in both the file they are defined in, as well as in other
+      files.
+    - To be used in other files than the one where they are defined, a forward
+      declaration with the extern keyword is needed.
+    - Non-constant global variables have external linkage by default.
+
+* Global symbolic constants:
+    - To avoid replication of global constants defined via a namespace in a
+      header file, do as follows;
+        + Within the namespace, define these variables as global external
+          variables in a separate cpp file.
+        + Modify the header file to store only the forward declaration of the
+          desired constant namespace.
+
+4.3 Static duration variables
+-----------------------------
+
+* The static keyword has different meanings depending on where it is used:
+    - Used with global variables:
+        + Denotes internal linkage, i.e., the variable can only be used within
+          the file where it is defined.
+
+    - Used with local variables:
+        + Changes them from automatic duration to static duration, i.e., retain
+          their value even after the scope in which they were created has been
+          exited.
+        + Static local variables are created only once and are persistent until
+          the end of the program.
+
+4.3b Namespaces
+---------------
+
+* Naming collision:
+    - Compiling error due to the presence of two or more identifiers with the
+      same name, within the same scope.
+
+* Namespace:
+    - Area of code in which all identifiers are guaranteed to be unique.
+    - By default, global variables and normal functions are defined in the
+      global namespace.
+    - Namespaces are intended to avoid naming collisions.
+    - Namespaces creation:
+          namespace Given_Name {
+              // Your code goes here.
+              double my_identifier();
+          }
+
+* Namespace access:
+    - Scope resolution operator (::):
+        + Prefix an identifier with the name of the namespace it belongs to and
+          double colons, ::
+              Given_Name::my_identifier();
+
+    - using keyword:
+        + Case 1. Using all identifiers in the namespace:
+              using namespace Given_Name;
+              my_identifier();
+
+        + Case 2. Using specific identifiers in the namespace:
+              using Given_Name::my_identifier;
+              my_identifier();
+
+    - The using keyword follows standard scope rules.
+
+* There is no way to cancel or replace namespaces load via the using keyword.
+  Their scope can only be limited by placing within a block code.
+
+* Multiple namespace block can be declared within a single project, they can
+  even be nested.
+
+4.4a Explicit type conversion (casting)
+---------------------------------------
+
+* C-style cast:
+    - Done via the () operator, with the name of the type to cast to inside:
+          int my_int;
+          float my_float = (float) my_int / 2;
+
+    - Not checked by the compiler. Therefore they may get ride of consts or
+      change data type without changing the underlying representation (resulting
+      in garbage data).
+
+* static_cast:
+    - static_cast<new_type>(x)
+    - Checked at compile time.
+
+4.4b An introduction to std::string
+-----------------------------------
+
+* string:
+    - Collection of sequential characters.
+
+* Built-in C++ data type which is part of the standard library
+  (#include <string>).
+
+4.5 Enumerated types
+--------------------
+
+* Data type where every possible value is defined as a symbolic constant
+  (enumerator).
+* Declaration:
+      enum Enum_Name {
+          LABEL_1 = -3,
+          LABEL_2,      // assigned -2.
+          LABEL_3,      // assigned -1.
+          LABEL_4 = 5,
+          LABEL_5       // assigned 6.
+      };
+
+* Definition:
+    - Enum_Name my_enum = LABEL_2;
+
+* Enumerated values evaluate to integers.
+* The compiler does not implicitly convert an integer to an enumerated value
+  (static_cast can be used but is not recommended).
+
+4.5a Enum classes
+-----------------
+
+* Also known as scoped enumeration.
+* Intended to prevent the comparison of enumerators from different enumerations
+  (fruits and color, for example).
+* Same definition than normal enumerators, but the keyword class has to be used
+  in between enum and the given name.
+* The scope qualifier has to be used to access the enumerators of each
+  enumeration. i.e., Enum_Name::LABEL_1.
+* No implicit conversion of enumerations to integers (but static_cast can be
+  used).
+
+4.6 Typedefs and aliases
+------------------------
+
+* Allow programmers to create aliases for data types.
+* Defined by the keyword typedef, followed by the type to alias, followed by the
+  alias name:
+    - typedef double name;
+    - This does not create a new type, only defines an alias.
+
+* Allow to easily change the underlying type of an object.
+* Can be used to hide platform dependent details.
+
+4.7 Structs
+-----------
+
+* Group variables of mixed data types together into a single unit.
+* Declared with the struct keyword:
+      struct Employee {
+          short id = 0;     // Default initialization is a feature of C++11/14.
+          int age = 0;
+          double salary = 0;
+     };
+
+* Members are accessed via the member selection operator (which is a period).
+* Initialization can be done via the uniform initialization scheme
+  (Employee joe{32, 35, 12.6};).
+* In C++11 the default and uniform initialization are incompatible, only one of
+  theme can be used.
+* From C++11 on, struct members can be assigned via the list initialization
+  (joe = {10, 55, 123.6};).
+* Structs can be passed-to and returned-from functions.
+* Structs can be nested.
+* Struct declaration in header files allows their use in multiple files.
+    - The scope rules for structs are the same than for any other variable.
+
+4.8 The auto keyword
+--------------------
+
+* Starting from C++11, the auto keyword may be used in place of the variable
+  data type, to automatically induce the variable data type during the
+  initialization.
+    - Trivial feature for basic data types but useful for complex objects.
+
+* From C++14, the auto keyword may also be used in function definitions to
+  automatically infer its return type.
+
+Chapter 6. Arrays, Strings, Pointers and References
+===================================================
+
+6.6 C-style strings
+-------------------
+
+* Array of characters that use a null terminator to indicate the string end
+  (null-terminated strings).
+      char my_string[] = “string”;
+
+* The length of the string array equals the number of characters in the string
+  plus one, accounting for the termination ‘\0’ character.
+* Functions to manipulate C-style strings are included as part of the standard
+  C++ library, just include the header <cstring>
+* It is recommended to avoid the use of C-style strings.
+
+6.7 Introduction to pointers
+----------------------------
+
+* Address of operator, &x:
+    - Returns A POINTER containing the memory address of variable x.
+
+* Dereference operator, *x:
+    - Returns the value at the memory address of variable x.
+
+* Pointer:
+    - Variable that holds a memory address as its value.
+    - Declared with an asterisk between the data type and the variable name,
+      i.e., double *var_name;.
+        + In this case the asterisk is NOT a deference, but part of the pointer
+          declaration syntax!!!
+
+* Assigning a value to a pointer:
+    - Simply use the address of operator:
+          int var;
+          int *ptr = &var;
+
+    - Pointer type has to match the type of the variable it points to.
+
+* Dereferencing pointers:
+    - Simply use the dereference operator, *x.
+
+6.7a Null pointers
+------------------
+
+* Null pointer:
+    - Pointer pointing to a null value (special character which means that the
+      pointer is not pointing to anything).
+          int *ptr1(0);
+          int *ptr2;
+          ptr2 = 0;
+
+* Null pointers evaluate to 0.
+* Deferencing null pointer is undefined.
+* Tough 0 initialization is possible, a best practice in C++ is to initialize
+  null pointers with the special keyword nullptr.
+
+6.8 Pointers and arrays
+-----------------------
+
+* An array variable (e.g., int arr[5]) contains the address of the 1st element
+  stored in the array, as if it were a pointer (&arr[0]).
+* In many occasions a fixed length array will decay (i.e., be implicitly
+  converted) into a pointer to the 1st array element, however:
+* A fixed length array and a pointer to it, are not identical (though both point
+  to the same memory address).
+    - Differences:
+          int arr[6];       // sizeof(arr) -> 5 * sizeof(int).
+          int *ptr = arr;   // sizeof(ptr) -> size of a memory address.
+          &ptr;             // yields the memory address of pointer variable.
+          &arr;             // returns a pointer to the entire array.
+
+* When passing a fixed array to a function, it decays into a pointer to its
+  first element (to avoid expensive data copying) .
+    - void func(int array[]) is identical to void func(int *array)
+
+* Arrays that are part of structs or classes do not decay when the whole struct
+  of class is passed to a function.
+
+6.8a Pointer arithmetic and array indexing
+------------------------------------------
+
+* Integer addition and subtraction can be performed on pointers, i.e., ptr+1 is
+  the address of the next integer / float in memory (if ptr is a pointer to int
+  / float).
+      int arr[5] = {5, 6, 7, 8, 9};
+      *(arr + 3);   // prints 8, since arr decays into a 1st element pointer.
+
+6.9 Dynamic memory allocation with new and delete
+-------------------------------------------------
+
+* C++ supports 3 different ways of memory allocation:
+    - Static (static and global variables (stack)).
+    - Automatic (function parameters and local variables (stack)).
+    - Dynamic (heap):
+        + Allocation (new operator):
+            : Returns a pointer to the allocated memory address.
+                  int *ptr = new int;
+
+            : Throws bad_alloc exception if allocation fails.
+                > Instead, a NULL pointer may be returned upon failure by using
+                  nothrow:
+                      int *ptr = new (std::nothrow) int;
+
+
+        * Deletion (delete operator):
+            : Done with the delete operator.
+            : Returns memory to the operating system, but memory isn't actually
+              deleted.
+            : The pointer variable, however, is not affected and can be assigned
+              a new value.
+            : Dangling pointer:
+                > Pointer to deallocated memory.
+
+6.9a Dynamic allocating arrays
+------------------------------
+
+* Done with the array form of new and delete operators:
+      int *arr = new[] int[7]();    // including direct initialization,
+      delete[] arr;                 // available from C++11.
+
+* C++  does not provide a build-in way to resize dynamically allocated arrays.
+    - This functionality is via vectors in the C++ standard library.
+
+6.10 Pointers and const
+-----------------------
+
+* Primarily used as function parameters to help ensure the function doesn't
+  inadvertently changes the passes in argument.
+
+* Pointing to a const variable:
+    - That is not possible, on the contrary, it would be possible to dereference
+      the non-const pointer and change the value!
+
+* Pointer to const value:
+    - Defined with the keyword const before the data type:
+          const int *ptr = &var;
+    - Treat var as constant when accessed through the pointer, regardless of
+      whether the var was initially defined as const or not.
+    - Since ptr is not constant itself, it can be redirected to point to other
+      variables.
+          const int *ptr = &var;
+          ptr = &var2;
+
+* Const pointers:
+    - Pointers whose value can not be changed after initialization.
+        + They will always point to the same address, but the value stored at
+          that address does not need to be constant.
+
+    - Defined via the *const keyword, placed between the type and the given name:
+          int *const ptr;
+    - Must be initialized upon declaration.
+
+* Const pointer to a const value:
+    - Can not be set to point to another address, nor can the value it is
+      pointing to be changed through the pointer.
+      const int *const ptr = &var;
+
+6.11 Reference variables
+------------------------
+
+* New type of C++ variable (besides normal and pointer variables) that acts as
+  an alias to another variables.
+* Declared by using & between the reference type ans the variable name:
+      int var = 5;
+      int var2 = 6;
+      int &ref = val;
+      // Assigns the value of var2 to ref, but does not change the reference!!!
+      ref = var2;
+
+* In this case the ampersand, &, does not mean “address of”, but reference to.
+* Using the address-of operator on a reference variable returns the address of
+  the value being referenced.
+* References are treated as being const, i.e., they must be initialized and once
+  initialized they can not be changed.
+* Reference to constant variables is done with the const keyword before the
+  type, i.e., const int &ref = var;
+    - As with the case of pointers, var does not need to be constant itself, but
+      when accessed through ref, it will be treated as such.
+
+* References are most often used as function parameters because they allow to
+  pass parameters without making a copy of the value itself:
+      // in this case ref is a reference to the argument passed in, not a copy.
+      void func(int &ref) {.. }
+      int n = 5;
+      func(n);            // however, here n is a non-reference argument.
+
+* As a rule of thumb, pass non-pointer, non-fundamental data type variables by
+  (const) reference.
+* Another common use of references is as shortcuts, i.e.,
+  int &ref = struct1.struct2.needVar;
+* When possible, references should be used instead of pointers.
+
+6.12 Member selection with pointers and references
+--------------------------------------------------
+
+* Structure members are selected via the period operator.
+* To access a struct member via a pointer, the pointer has to be dereferenced:
+      struct Person {
+          int age;
+          double weight;
+
+      } Person person;
+      Person *ptr = &person;
+      (*ptr).age; // here is where dereference occurs.
+
+* To avoid the error prone and awkward notation, C++ incorporates the pointer
+  selection operator, ->:
+      ptr->age;
+
+6.12a For-each loops
+--------------------
+
+* New range-bases loop, introduced in C++, with a simplified and secure syntax.
+    - Example, use of reference avoiding copy and detecting data type:
+          int arr[] = {0, 1, 1, 2, 3, ,5, 8, 13, 21};
+          for(auto &ref : arr) {  // deduce the proper element type ;-).
+              std::cout<<ref;
+          }
+
+* Use the use of references or const references for the element declaration in
+  for-each loops.
+* For-each loops work with many kinds of list-like structures (vectors, linked
+  lists, trees, and maps).
+* For-each loops need to know the length of the structure they are iterating:
+    - Does not work with pointers to arrays :-(
+
+6.13 Void pointers
+------------------
+
+* Generic pointers that can be pointed to objects of any data type.
+* Declared as a normal pointer using the void keyword:
+* Can not be dereferenced directly, but need to be casted to another pointer
+  type before dereference:
+      int var;
+      void *ptr = &var;
+      int *ptrInt = static_cast<int*>(ptr);
+      std::cout<<ptrInt<<endl;
+
+* They can be used as function parameters to pass in different data types.
+* In general, void pointers should be avoided.
+
+6.14 Pointers to pointers
+-------------------------
+
+* Pointers that hold the address of another pointers. Declared and dereferenced
+  via nested asterisks:
+      int var = 5
+      int *ptr = &var;
+      int **ptrPtr = &ptr;
+      std::cout<<**ptrPtr<<endl;
+
+* Can not be directly assigned to a value but set to null.
+* Their most common use is to dynamically allocate arrays of pointers:
+      // dynamic allocation of an array of 10 int pointers.
+      int **arr = new int*[10];
+
+* Allocation of two-dimensional arrays:
+    1) allocate an array of pointers.
+    2) iterate over it and allocate a dynamic array for each array element.
+          int **arr = new int[10];
+          for(int n; n < 10; n++) arr[n] = new int[5];
+
+    - Dynamically allocated memory has to be deallocated in the opposite order
+      than it was allocated.
+
+6.15 An introduction to std::array
+----------------------------------
+
+* Provide fixed array functionality without decaying into pointers when passed
+  in to functions.
+* This functionality is loaded via the <array> header.
+* Their size must be set a compile time:
+      #include <array>
+      std::array<int, 3> myArray;    // declares an integer array with length 3.
+
+* Can be initialized using an initializer list or via uniform initialization:
+      // in this case the array length can not be omitted.
+      std::array<int, 5> myArray {1, 2, 3, 4, 5};
+
+* Values can be assigned using an initializer list.
+* Access to individual elements can done via :
+    - The subscript operator, i.e., myArray[2] = 8;
+    - The at() function. i.e., myArray.at(2) = 8;
+
+* The library includes many useful function to deal with arrays such as size,
+  sort, begin, end, etc.
+
+6.16 An introduction to std::vector
+-----------------------------------
+
+* Provides functionality to deal with dynamic arrays in a easy and safe manner.
+    - Without explicit memory allocation and deletion.
+
+* This functionality is loaded via the <vector> header.
+* No need to provide length at declaration:
+      std::vector<int> arr;
+
+* Assignment can be done via initializer-list.
+* Can be initialized using an initialized list or using the uniform method.
+* Elements access can be done via:
+    - The subscript operator, i.e., arr[1] = 4;
+    - The at() function, i.e., arr.at(1) = 4;
+
+* When a vector variable goes out of scope, it is automatically deallocated.
+* The length of a vector is provided by the size() function.
+* Vector can be resized via the resize() function:
+    - If increase, old elements are preserved and new entries are set to zero.
+    - If reduced, element are dropped from the high-index end.
+    - Resizing ix computationally expensive, better to try to avoid it.
+
+Chapter 7. Functions
+====================
+
+7.1 Function parameters and arguments
+-------------------------------------
+
+* Parameter:
+    - Variable declared in the function declaration.
+
+* Argument:
+    - Value pass to a function by the caller.
+
+* When a function is called, all its parameters are created as variables and the
+  value of the arguments are copied into the newly created parameters.
+
+7.2 Passing arguments by value
+------------------------------
+
+* C++ default.
+* Copies argument values into function parameters.
+    - Arguments are never modified, only their copies may be changed (this may
+      be an advantage or disadvantage).
+
+* Mainly used to pass fundamental data types or enums.
+
+7.3 Passing arguments by reference
+----------------------------------
+
+* In this case function parameter are declared as references rather than normal
+  variables.
+      void func(int &var1, float &var2, ...) {... }
+    - Any changes made in the reference are passed though the whole argument.
+
+* Returning multiple values via out parameters:
+    - Function can only return a single value.
+    - Multiple values can be returned via references.
+
+* Pass by const reference:
+    - Used to pass large structures (expensive to copy) but ensuring they wont
+      be modified by the function, only used.
+
+* References ALWAYS point to the same variable!
+
+7.4 Passing arguments by address
+--------------------------------
+
+* This passes the address of the argument variable rather than the argument
+  variable.
+    - The function parameter must be a pointer.
+    - The function can dereference the pointer to access or change the values
+      being pointed.
+
+* Typically used with arrays (with decay to pointers when passed to functions!)
+  and dynamically allocated variables.
+* The length must be passed as a separated argument.
+* Addresses are actually passed by value:
+    - When a pointer is passed to a function by address, the pointer's value
+      (the address it points to) is copied from the argument to the function's
+      parameter, consequently, the original pointer can be changed (point to
+      somewhere else), only the copy:
+          void foo(int *ptr) {
+              // only the COPY of ptr is pointed to other address,
+              // not the original pointer.
+              ptr = nullptr;
+          }
+              int main() {
+              int var = 5;
+              int *ptr = &val;
+              foo(ptr);
+              std::cout<<*ptr<<endl;  // this prints 5.
+          }
+
+    - Notice that although the address is passed by value, the passed copy of
+      the address can still be dereferenced to change the arguments value!!!
+
+* Passing addresses by reference:
+    - Used when we want to change the address an argument point to from within
+      the function!
+    - In this case the address has to be passed by reference (following a
+      cumbersome syntax):
+          void foo(int *&ptr) {   // ptr is now a reference to a pointer.
+              ptr = nullptr;
+          }
+          int main() {
+              int var = 5;
+              int *ptr = &var;
+              foo(ptr);
+          }
+
+    - C++ PASSES EVERYTHING BY VALUE.
+        + However, passed addresses (copies) can be dereferenced to change the
+          values of the passed in arguments.
+
+7.4a Returning values by value, reference and address
+-----------------------------------------------------
+
+* Return by value:
+    - In this case, a copy of the value is returned to the caller.
+        + There are not scope issues.
+        + This is a slow method to return large structures.
+
+* Return by reference:
+    - This method returns the address of a variable to the caller (copies an
+      address from the function to the caller).
+        + Returning the address of local variables to the caller will result in
+          dangling pointers, since local variables are deallocated when the
+          function ends.
+        + This method is commonly used to return dynamically allocated arrays:
+              int* allocatedArray(int size) {
+                  return new int[size];
+              }
+
+* Return by reference:
+    - A reference to the variable is passed back to the caller.
+        + References to local variables should not be returned, since they go
+          out of scope after function execution.
+        + Typically used to return arguments passed by reference to the function
+          back to the caller:
+              int& foo(int &var) {
+                  return(var);
+              }
+
+7.6 Function overloading
+------------------------
+
+* Feature of C++ that allows the creation of multiple functions with the same
+  name, so long as they have different parameters:
+      int add(int x, int y);            // integer version..
+      double add(double x, double y);   // floating point version.
+
+* During execution, the called version will depend on the passed parameters.
+* Function return types are not considered for uniqueness;
+      // including these two functions in the same file will result in an error.
+      int foo(int x);
+      double foo(int x);
+
+* Typedefs are not distinct:
+    - The following two declarations will be considered identical:
+          typedef char *stringr;
+          void foo(string value);
+          void foo(char *value);
+
+* Making  call to an overloaded function results in one on three possible
+  scenarios:
+    1) A match is found. The call is resolved to a particular overloaded
+       function.
+    2) No match found. The arguments can no be matched to any overloaded
+       function (even after implicit type promotion).
+    3) An ambiguous match is found. The arguments matched more than one
+       overloaded function.
+
+7.7 Default parameters
+----------------------
+
+* Function parameter with predefined values. If the user does not provide a
+  value for this parameter, the default value will be used:
+      void foo(int x, int y=7) {...}
+      int main() {
+          foo(5);     // this call will use the default value, i.e., foo(5, 7).
+          foo(5, 3);  // in this case, the default parameter is overwritten.
+      }
+
+* Each function parameter can be assigned a default value, but:
+    - Default parameters must be the rightmost parameters, i.e.,
+      void foo(int x=10, int y, int z=7) is not allowed
+
+* Default parameters can only be declared once:
+    - Functions with a forward declaration MUST declare the default parameters
+      on either the function declaration or the definition, but NOT both:
+          void foo(int x, int y=0);
+          void foo(int x, int y=0) {...}  // this will cause an error.
+
+* The best practice is to declare the default parameters in the forward
+  declaration.
+
+* Functions with default parameters may be overloaded but the default parameters
+  do NOT count as a distinctive feature. i.e., cases such as the following are
+  not allowed:
+      void foo(int x);
+      void foo(int x, int y=10);
+
+7.8 Function pointers
+---------------------
+
+* Similar to variable pointers but storing the address of a function.
+* Declaration:
+      // pointer to a function that "takes no arguments and return an integer".
+      int (*funcPtr)();
+    - funcPtr can point to any function that matches its signature.
+
+* Assignment:
+    - C++ implicitly converts function to function pointers if needed,
+      therefore, there is no need to use the address-of operator, &.
+    - Done without the () operator, i.e., :
+      int foo(int x) {...}
+      int goo(int y) {...}
+      int main() {
+          int (*funcPtr)(int) = foo;  // here funcPtr points to function foo.
+          funcPtr = goo;              // here it points to function goo.
+      }
+
+* Calling a function using a function pointer:
+    - Explicit dereference:
+          (*funcPtr)(5);  // this will call foo with the passed in argument 5.
+
+    - Implicit derefetence:
+          funcPtr(7);     // this will call foo with the passed in argument 7.
+        + this looks exactly the same than a normal function!!!
+            : The reason is that normal function names are nothing but pointers
+              to functions ;-).
+
+    - Default parameters are resolved at compile-time and, therefore, won't work
+      for functions called via pointers.
+
+* Passing function pointers to other functions (callback functions):
+      bool inc(int x, int y) {...}        // option 1.
+      bool dec(int x, int y) {...}        // option 2.
+      void master(int var1, int var2, bool (*option)(int, int)) {
+          if(option(var1, var2)) {...}
+      }
+      int main(){
+          master(1, 2, inc);      // in this case master will use option 1.
+          master(1, 2, dec);      // in this case master will use option 2.
+      }
+
+* Providing default functions:
+       void master(int var1, int var2, bool (*option)(int, int) = inc);
+
+* Alternative definition using std::function (<functional>) starting from C++11:
+      std::function<bool(int, int)> funcPtr;
+
+7.9 The stack and the heap
+--------------------------
+
+* Memory used by a program:
+    - code segment: Stores the compiled program.
+    - bss segment: Stores zero-initialized global and static variables.
+    - data segment: Stores initialized global and static variables.
+    - heap: Where dynamically allocated variables are allocated from.
+    - call stack: Stores function parameters and local variables.
+
+* heap:
+    - Slow memory allocation.
+    - Allocated memory remains allocated until deletion or program termination.
+    - Allocated memory has to be accessed through pointers (~slow dereference).
+    - Big pool of memory.
+
+* stack data structure:
+    - Last-in, first-out data structure, supporting three operations:
+        + Look top item, top().
+        + Take the top item, pop().
+        + Put a new item on top, push().
+
+* call stack:
+    - Implements a stack data structure which:
+        + Keeps track of all active functions from the start of the program to
+          the current point of execution.
+        + Handles allocation of all local variables and function parameters.
+
+    - Has a small size (1-8Mb):
+        + stack overflow is surpassed.
+
+    - Fast memory allocation.
+    - All memory allocated in the stack is known at compile-time:
+        + It can be accessed through a variable.
+
+7.10 std::vector capacity and stack behavior
+--------------------------------------------
+
+* std::vector:
+    - Dynamic array (resizable).
+
+* Length:
+    - How many elements are being used.
+
+* Capacity:
+    - How many elements were allocate.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
