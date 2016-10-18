@@ -1136,11 +1136,206 @@ Chapter 7. Functions
 * std::vector:
     - Dynamic array (resizable).
 
-* Length:
-    - How many elements are being used.
+* Length vs capacity:
+    - Length:
+        + How many elements are being used.
 
-* Capacity:
-    - How many elements were allocate.
+    - Capacity:
+        + How many elements were allocate.
+
+    - When a vector shrinks via resize(), it reduces its length not its capacity
+      (for if it need to be increased later on).
+        + Resizing (reallocation) is expensive.
+
+    - Array subscripts and at() are based on length, not capacity.
+
+    - Vector can be asked to reserve memory beforehand via reserve():
+          std::vector<int> stack;
+          stack.reserve(5); // reserves space for at least 5 integers.
+
+* Stack implementation via vectors:
+    - push_back(): pushes an element on the stack.
+    - back()     : returns the value of the top element on the stack.
+    - pop_back() : pops top element off the stack.
+          void print(cosnt std::vector<int> &stack) {
+              for(const auto &element : stack) std::cout << element<< '';
+          }
+          int main() {
+              std::vector<int> stack;
+              stack.push_back(5); print(stack); // 5     (cap 1, len 1, top 5).
+              stack.push_back(3); print(stack); // 5 3   (cap 2, len 2, top 3).
+              stack.push_back(1); print(stack); // 5 3 1 (cap 3, len 3, top 1).
+              stack.pop_back(); print(stack);   // 5 3   (cap 3, len 2, top 3).
+              stack.pop_back(); print(stack);   // 5     (cap 3, len 1, top 5).
+          }
+
+7.11 Recursion
+--------------
+
+* Function that calls itself.
+
+* A termination condition is needed to prevent infinite calls (stack overflow).
+
+* More expensive than iterative (loop-like) solutions, due to function overhead.
+
+      int fibonacci(int number) {
+          if(number == 0) return 0;       // base case termination condition.
+          if(number == 1) return 1;       // base case termination condition.
+          return fibonacci(number - 1) + fibonacci(number - 2);
+      }
+      int main() {
+          for(int n=0; n<13; n++) std::cout << fibonacci(n) << '';
+          return(0);
+      }
+
+7.12 Handling errors (assert, cerr, exit and exceptions)
+--------------------------------------------------------
+
+* Handling semantic errors (syntactically correct but unintended behavior):
+    - Logic errors: Incorrect code of a logic statement.
+    - violated assumption: Assumes something is either false or true but is not.
+
+* Defensive programming:
+    - Style that tries to identify areas where assumptions may be violated, and
+      writes code to detect and handle any of these assumption violations.
+
+* Detecting assumption errors:
+    - At the top of each function, check to make sure any parameter have the
+      appropriate values.
+    - After a function has returned, check the return values, and any other
+      error reporting mechanisms, to see if an error occurred.
+    - Validate any user input to make sure it meets the expected formatting or
+      range criteria.
+
+* Handling assumption errors:
+    - Quietly skip the code that depends on the assumption being valid.
+    - Return an error code back to the caller and let the caller deal with the
+      problem.
+    - If, upon an assumption violation, the program needs to be terminated
+      immediately, call exit() (which lives in the <cstdlib>).
+    - Print an error message describing the error.
+
+* Assert:
+    - Friendly build-in function to detect violated conditions and print
+      descriptive messages:
+        + If the conditional expression is true, the assert statement does
+          nothing, otherwise evaluates to false and prints an error message
+          containig:
+            : The conditional expression that failed.
+            : The name of the code file where the error occurred.
+            : The line number where the error occurred.
+
+    - Loaded via <cassert>.
+    - It includes some overhead each time the assert condition is checked.
+    - assert can be turned off in production code via: #define NDEBUG.
+
+          int foo(int var) {
+              assert(var >= 0 && 'descriptive message!!!');
+              return(0);
+          }
+
+7.13 Command line arguments
+---------------------------
+
+* Optional string arguments passed by the operating system to the program when
+  it is started.
+
+* In this case the main function takes two arguments, named argc and argv by
+  convention.
+    - argc:
+        + Integer containing the count of the number of arguments passed to
+          the program.
+    - argv:
+        + Argument values, stored in an array of C-like strings.
+        + Numeric arguments should be converted from strings
+
+              #include <iostream>
+              #include <string>
+              #include <sstream>
+              int main(int argc, char *argv[]) {
+                // setup a stringstream variable named convert, initialized with
+                // the input from argv[1].
+                std::stringstream convert(argv[1]);
+                int numArg;
+                if(!(convert >> numArg)) {  // DO THE CONVERSION.
+                    numArg = 0;
+                }
+              }
+
+Chapter 8. Basic object-oriented programming
+============================================
+
+8.2 Classes and class members
+-----------------------------
+
+* Classes:
+    - Complex structures which, in addition to data, may contain functions.
+    - Declared with the "class" keyword.
+
+* Member function:
+    - Function defined inside a class.
+
+* Class members are accessed with the selection operator (.).
+
+* By convention, class names should be start with an upper-case letter.
+
+* Instantiation:
+    - Declaration (memory allocation) of a class variable.
+
+* Instance / Object:
+    - Particular variable of a class type.
+
+      class Class_name {
+      public:
+          double varDou;
+          int varInt;
+
+          void foo() {
+              std::cout << 'What a member function\n';
+              return(0);
+          }
+
+      }
+      int main() {
+          Class_name classVar;
+          classVar.varDou = 0.2;
+          classVar.foo();
+      }
+
+8.3 Public vs private specifiers
+--------------------------------
+
+* Public members:
+    - Members that can be accessed from outside of the class.
+    - Defined with the "public:" keyword (notice this is followed by a colon).
+
+* Private member:
+    - Members that can only be accessed by other members of the class.
+    - Defined with the "private:" keyword (notice this is followed by a colon).
+
+* Each class member acquires the access level of the previous access specifier.
+
+* Member variables are private by default.
+
+* Member functions are public by default.
+
+* C++ allows structs to include member function. The fundamental difference
+  between structs and classes is that, by default, all the struct members
+  (variables and functions) are public.
+
+8.4 Access functions and encapsulation
+--------------------------------------
+
+* Separating the interface from the implementation reduces the complexity of
+  using objects.
+
+* Encapsulation:
+    - Access to objects is granted via a public interface, but the
+      implementation is hidden to the final user.
+
+    - Implemented via access specifiers.
+
+    -
 
 
 
