@@ -220,25 +220,19 @@ Chapter 2. Variables and Fundamental Data Types
 * Fundamental data types:
     - boolean:
         + bool
-
     - character:
         + char, wchar_t, char16_t, char32_t
-
     - integer:
         + short, int, long, long long
-
     - float:
         + float, double, long double
-
     - void (no type)
 
 * Variable initialization (NOT assignment!!!):
     - copy:
          int var = 5;
-
     - direct:
           int var(5);
-
     - uniform:
           int var{5};
         : If empty, {}, set variable to default value (zero or empty depending
@@ -250,13 +244,10 @@ Chapter 2. Variables and Fundamental Data Types
 * Signed and unsigned types by size (C99, C++11):
     - 1 byte:
         + int8_t, uint8_t
-
     - 2 bytes:
         + int16_t, uint16_t
-
     - 4 bytes:
         + int32_t, uint32_t
-
     - 8 bytes:
         + int64_t, uint64_t
 
@@ -273,10 +264,8 @@ Take the form significand x 10^{exponent}
 * IEEE 754 standard, significands by byte size:
     - 4 bytes:
         + 6 - 9, typically 7
-
     - 8 bytes:
         + 15 - 18, typically 16
-
     - 16 bytes:
         + 33 - 36
 
@@ -528,7 +517,7 @@ Chapter 4. Variable Scope and More Types
           short id = 0;     // Default initialization is a feature of C++11/14.
           int age = 0;
           double salary = 0;
-     };
+      };
 
 * Members are accessed via the member selection operator (which is a period).
 * Initialization can be done via the uniform initialization scheme
@@ -702,7 +691,8 @@ Chapter 6. Arrays, Strings, Pointers and References
         + They will always point to the same address, but the value stored at
           that address does not need to be constant.
 
-    - Defined via the *const keyword, placed between the type and the given name:
+    - Defined via the *const keyword, placed between the type and the given
+      name:
           int *const ptr;
     - Must be initialized upon declaration.
 
@@ -1058,12 +1048,12 @@ Chapter 7. Functions
     - C++ implicitly converts function to function pointers if needed,
       therefore, there is no need to use the address-of operator, &.
     - Done without the () operator, i.e., :
-      int foo(int x) {...}
-      int goo(int y) {...}
-      int main() {
-          int (*funcPtr)(int) = foo;  // here funcPtr points to function foo.
-          funcPtr = goo;              // here it points to function goo.
-      }
+          int foo(int x) {...}
+          int goo(int y) {...}
+          int main() {
+              int (*funcPtr)(int) = foo;  // here funcPtr points to function foo
+              funcPtr = goo;              // here it points to function goo.
+          }
 
 * Calling a function using a function pointer:
     - Explicit dereference:
@@ -1090,7 +1080,7 @@ Chapter 7. Functions
       }
 
 * Providing default functions:
-       void master(int var1, int var2, bool (*option)(int, int) = inc);
+      void master(int var1, int var2, bool (*option)(int, int) = inc);
 
 * Alternative definition using std::function (<functional>) starting from C++11:
       std::function<bool(int, int)> funcPtr;
@@ -1148,7 +1138,6 @@ Chapter 7. Functions
         + Resizing (reallocation) is expensive.
 
     - Array subscripts and at() are based on length, not capacity.
-
     - Vector can be asked to reserve memory beforehand via reserve():
           std::vector<int> stack;
           stack.reserve(5); // reserves space for at least 5 integers.
@@ -1173,11 +1162,8 @@ Chapter 7. Functions
 --------------
 
 * Function that calls itself.
-
 * A termination condition is needed to prevent infinite calls (stack overflow).
-
 * More expensive than iterative (loop-like) solutions, due to function overhead.
-
       int fibonacci(int number) {
           if(number == 0) return 0;       // base case termination condition.
           if(number == 1) return 1;       // base case termination condition.
@@ -1228,7 +1214,6 @@ Chapter 7. Functions
     - Loaded via <cassert>.
     - It includes some overhead each time the assert condition is checked.
     - assert can be turned off in production code via: #define NDEBUG.
-
           int foo(int var) {
               assert(var >= 0 && 'descriptive message!!!');
               return(0);
@@ -1239,7 +1224,6 @@ Chapter 7. Functions
 
 * Optional string arguments passed by the operating system to the program when
   it is started.
-
 * In this case the main function takes two arguments, named argc and argv by
   convention.
     - argc:
@@ -1248,7 +1232,6 @@ Chapter 7. Functions
     - argv:
         + Argument values, stored in an array of C-like strings.
         + Numeric arguments should be converted from strings
-
               #include <iostream>
               #include <string>
               #include <sstream>
@@ -1276,31 +1259,26 @@ Chapter 8. Basic object-oriented programming
     - Function defined inside a class.
 
 * Class members are accessed with the selection operator (.).
-
 * By convention, class names should be start with an upper-case letter.
-
 * Instantiation:
     - Declaration (memory allocation) of a class variable.
 
 * Instance / Object:
     - Particular variable of a class type.
-
-      class Class_name {
-      public:
-          double varDou;
-          int varInt;
-
-          void foo() {
-              std::cout << 'What a member function\n';
-              return(0);
+          class Class_name {
+          public:
+              double varDou;
+              int varInt;
+              void foo() {
+                  std::cout << 'What a member function\n';
+                  return(0);
+              }
           }
-
-      }
-      int main() {
-          Class_name classVar;
-          classVar.varDou = 0.2;
-          classVar.foo();
-      }
+          int main() {
+              Class_name classVar;
+              classVar.varDou = 0.2;
+              classVar.foo();
+          }
 
 8.3 Public vs private specifiers
 --------------------------------
@@ -1314,11 +1292,8 @@ Chapter 8. Basic object-oriented programming
     - Defined with the "private:" keyword (notice this is followed by a colon).
 
 * Each class member acquires the access level of the previous access specifier.
-
 * Member variables are private by default.
-
 * Member functions are public by default.
-
 * C++ allows structs to include member function. The fundamental difference
   between structs and classes is that, by default, all the struct members
   (variables and functions) are public.
@@ -1328,25 +1303,500 @@ Chapter 8. Basic object-oriented programming
 
 * Separating the interface from the implementation reduces the complexity of
   using objects.
-
 * Encapsulation:
     - Access to objects is granted via a public interface, but the
       implementation is hidden to the final user.
-
     - Implemented via access specifiers.
+    - Benefits:
+        + To use fully encapsulated classes, it is only needed to know what are
+          its public member functions, which arguments do they take and what
+          values they return.
+        + Encapsulated classes help to protect your data and prevent misuse.
+        + Encapsulated classes are easier to modify and debug.
 
-    -
+* Access functions;
+    - Short public function whose job is to retrieve (Getters) or change
+      (Setters) the value of a private member variable.
+    - Getters should usually return by value of const reference, not non-const
+      reference.
 
+8.5 Constructors
+----------------
 
+* Public members can be initialized via an initialization list or uniform
+  initialization.
+* Constructors:
+    - Special member function that is automatically called when an object of
+      that class is instantiated.
+    - Typically used to initialize member variables or setup steps necessary for
+      the class to be used.
+    - Special constructor rules;
+        + Should always have the same name as the class (with same
+          capitalization)
+        + Have not return type.
 
+    - They can not be explicitly called.
 
+* Default constructors:
+    - Constructor that takes no parameters.
 
+* Constructor with parameters:
+    - Useful to provide direct or uniform initialization of members:
+          class Fraction{
+          private:
+              int m_var1;
+              int m_var2;
 
+          public;
+              // Default constructor
+              Fraction() {
+                  m_var1 = 1.;
+                  m_var2 = 0.;
+              }
 
+              // Constructor which takes at least one argument parameters.
+              Fraction(int val1, int val2 = 3.) {
+                  m_var1 = val1;
+                  m_var2 = val2;
+              }
+          }
 
+          int main() {
+              Fraction frac1();     // Uses default constructor.
+              Fraction frac2(2);    // Used the 2nd constructor with one arg.
+              Fraction frac3{4,5};  // Used the 2nd constructor with two args.
+          }
 
+* Copy initialization of classes:
+    - Done via the = operator, e.g., Fraction frac4 = 7;
+    - Non-recommended due to performance issues.
 
+* The number of constructors should be minimized. For the previous example, a
+  default constructor can be redefined as Fraction(int val1 = 0, int val2 = 0).
+* If no constructor is provided, C++ will define a default EMPTY constructor,
+  which, however, does not initialize any class members.
+* Classes containing classes;
+    - A class may contain another classes as variables.
+    - When the outer class is constructed, the member variables will have their
+      default constructor called.
 
+8.5a Constructor member initializer lists
+-----------------------------------------
+
+* Assigning values to any member variables in the body of the constructor is not
+  always sufficient:
+    - Some data types must be initialized in the same line they are defined.
+
+* C++ solves the previous problem via a "member initializer list" (MIL), which:
+    - Is inserted after the constructor parameters.
+    - Begins with a semicolon and is followed by a comma-separated the list of
+      each variable to initialize, with the desired value provided via direct
+      initialization.
+
+      class Some{
+      private:
+          cons int m_var1;
+          int m_var2;
+          int m_var3;
+
+      public:
+          Some(int val1, int val2 = 2, int val3 = 8) :
+            m_var1(val1), m_var2(val2), m_var3(val3) {
+
+          }
+
+      }
+
+    - In C++11 uniform initialization may be used instead of direct
+      initialization, e.g., Some(int val = 1) : var{val} {}
+    - Initialization lists are REQUIRED when doing composition and inheritance.
+    - MIL initialize members does NOT assign values to them!
+
+8.5b Non-static member initialization
+-------------------------------------
+
+* From C++11 on, it is possible to give non-static member variables a default
+  initialization value.
+      class Some{
+      private;
+          int var1 = 10;    // default value 10.
+          int var2 = 5;     // default value 5.
+
+      public:
+          // this constructor use the default values.
+          Some() {}
+
+          // Non-default constructor using the passed in values.
+          Some(int val1, val2) : var1{val1}, var2{val2} {}
+      }
+
+* If default initialization is provided, but the default constructor is missing,
+  it wont be possible to create class instances.
+* MIL has precedence over default initialization.
+* Non-static member initialization should be favored to give default values to
+  member variables.
+
+8.6 Overlapping and delegation of constructors
+----------------------------------------------
+
+* This refers to constructors with overlapping FUNCTIONALLITY:
+      class Foo{
+      public:
+          Foo() {
+             // code to do A (replicated).
+          }
+          Foo(int var) {
+              // code to do A (replicated).
+              // code to do B (non-replicated).
+          }
+      }
+
+* It is a common practice to define an Init() (defined as either public or
+  private according to the actual needs) function which initializes member
+  variables and is called bi the different constructors:
+    class Foo{
+    public:
+        Foo() {
+            InitA();
+        }
+        Foo(int var) {
+            InitA();
+            // code to do B.
+        }
+        // function doing A.
+        InitA() {}
+    }
+
+* Delegating constructors:
+    - Starting with C++11, constructors are allowed to call other constructors.
+    - In this case the desired constructor is called in the MIL (NOT in the body
+      of the calling constructor):
+          class Foo{
+          public:
+              // constructor to do A.
+              Foo() {
+                  // code to do A.
+              }
+              // uses Foo() to do A.
+              Foo(int var) : Foo() {
+
+              }
+          }
+
+8.7 Destructors
+---------------
+
+* Special member function that is executed when an object is destroyed (clean
+  ups).
+* Called an object goes out of scope or when the keyword "delete" is used.
+* C++ implements an automatic destructor for simple classes, but classes holding
+  any resources (dynamic memory, files or databases) require and explicit
+  implementation.
+* Destructor naming:
+    - Must have the same name than the class, preceded by a tilde (~).
+    - Can not take arguments.
+    - Do not have return type.
+
+      class Foo {
+      privet:
+          int *m_arr;
+          int m_len;
+
+      public:
+          // constructor.
+          Foo(int val) : m_len{val} {
+              assert(m_len > 0);
+              m_arr = new int[m_len];
+          }
+          // destructor.
+          ~Foo() {
+              delete[] m_arr;
+          }
+      }
+
+      int main() {
+          Foo myFoo1(5);        // here the 1st instance is created.
+          Foo myFoo2(5)         // here the 2nd instance is created.
+          // here something is done with both array instances.
+          {
+
+          }
+          // here the destructor of the 2nd instance is called.
+          delete myFoo2;
+      }   // here the destructor of the 1st instance is called.
+
+* Resource Acquisition Is Initialization (RAII):
+    - Programming technique whereby resource use is tied to lifetime of objects
+      with automatic duration.
+    - In C++, RAII is implemented via constructors and destructors.
+        + A resource is acquired in the object's constructor, so that it can be
+          used while the object is alive, and resources are released in the
+          destructor.
+
+* If the program calls the exit() function, destructors are not called and,
+  therefore, resources are never released.
+
+8.8 The hidden "this" pointer
+-----------------------------
+
+* All normal member functions have a "*this" pointer that refers to the object
+  the function was called on. This pointer works as follows:
+    - Given the implementation:
+          class Foo {
+          private:
+              int m_var;
+          public:
+              Foo(int val) {
+                  setVar(val);
+              }
+              void setVar(int val) {
+                  m_var = val;
+              }
+              int getVar() {
+                  return m_var;
+              }
+          };
+
+          int main() {
+              Foo myFoo(1);
+              myFoo.setVar(1);
+              std::cout << myFoo.getVar() <<std::endl;
+              return 0;
+          }
+    - When myFoo.setVar(1) is called, the compiler actually calls
+       setVar(&myFoo, 1).
+    - Inside setVar(), the *this pointer holds the address of the object myFoo.
+    - Any member variable inside setVar() are prefixed with "this->". So when we
+      say m_var = val, the compiler is actually executing this->m_var = val,
+      which in this case updates myFoo.m_var to val.
+
+* *this always points to the object being operated on.
+* Some times it is necessary to reference the *this pointer explicitly
+  (disambiguation):
+      class Foo {
+      private:
+          int data;                 // member variable.
+      public:
+          Foo(int data) {
+              this->data = data;    // using this to reference the member var
+          }
+
+      };
+
+* Chaining objects:
+    - Useful to call several function on the same object.
+    - Implemented by returning a pointer to the object each function is
+      operating on:
+          class Foo {
+          privet:
+              int m_var;
+          public:
+              Foo(int val = 1) : m_var{val} {}
+              Foo& func1(int val) {// do something; return *this;}
+              Foo& func2(int val) {// do something; return *this;}
+              Foo& func3(int val) {// do something; return *this;}
+          };
+          int main() {
+              Foo myFoo(1);
+              myFoo.func1(2).func2(4).func3(8);     // chained functions.
+          }
+
+* The "this" pointer is implicitly added to any member function.
+* It is a const pointer, i.e., its value can be changed but not the address it
+  points to.
+
+8.9 Class code and the header files
+-----------------------------------
+
+* Defining member functions outside the class definition:
+    - Why is this useful?
+        + Mixing the declaration and implementation makes the class harder to
+          manage and work.
+        + Using an already-written class only requires understanding its public
+          interface.
+
+    - In C++ it is done by defining the class member functions outside of the
+      class declaration.
+        + Define the class member functions as if they were normal functions,
+          but prefix the class name to the function using the scope resolution
+          operator (::) (same as it is done for namespaces)
+
+          // class declaration.
+          class Foo {
+          private:
+              int m_var1;
+              int m_var2;
+          public:
+              Foo(int val1, int val2) : m_var1{val1}, m_var2{val2};
+              void func1(int arg1, int arg2);
+              Foo& func2(int arg1, int arg2);
+          };
+          // implementation of member functions.
+          Foo::Foo(int val1, int val2) : m_var1{val1}, m_var2{val2} {
+              // implementation block.
+          }
+          void Foo::func1(int arg1, int arg2) {
+              // implementation block.
+          }
+          Foo& Foo::func2(int arg1, int arg2) {
+              // implementation block.
+              return *this;
+          }
+
+* Putting class definitions in a header file:
+    - Class declarations can be put in header files so that they can be reused
+      in other files or projects.
+    - Class declarations are put in a header file of the same name as the class
+      (traditionally).
+    - Class implementations are put in a .cpp file of the same name as the
+      class.
+          + Header file "Foo.h":
+              #ifndef FOO_H
+              #define FOO_H
+              class Foo {
+              private:
+                  int m_var1;
+                  int m_var2;
+              public:
+                  Foo(int val1, int val2) : m_var1{val1}, m_var2{val2};
+                  int func1(int arg1);
+                  int fucn2();
+              };
+              #endif
+
+          + Implementation file "Foo.cpp":
+              # include "Foo.h"
+
+              // Foo constructor.
+              Foo::Foo(int val1, int val2) {// initialization code.}
+              // Foo member functions.
+              int Foo::func1(int arg1) {// func1 implementation.}
+              int Foo::func2() {// func2 implementation.}
+
+    - Any other code file that wants to use the Foo has to include "Foo.h" only
+      (but, still "Foo.cpp" has to be compiled into any project that uses it).
+    - If declaration and implementation are done in the same header file:
+        + The class implementation will be copied and recompiled into any file
+          that #includes it (slow and bulky process).
+
+* Default parameters for member functions:
+    - should be declared in the class declaration (so that they can be seen by
+      any other file).
+
+* Libraries:
+    - Programs need declarations from headers for the compiler to verify that
+      code being written is syntactically correct.
+    - Implementation can be included in precompiled files which have to linked
+      at the link stage (you never see the code).
+
+8.10 Const class objects and member functions
+---------------------------------------------
+
+* Instantiated class objects can be made const via the "const" keyword.
+* Initialization is done via class constructors.
+    - After initialization, any modification of member variables is not
+      possible.
+
+* const objects can ONLY explicitly call const member functions:
+* const member functions:
+    - i.e., functions guarantying that they wont modify the object or call any
+      non-const member functions.
+    - const member functions are declared by appending the const keyword to the
+      function prototype, after the parameter list, but before the function
+      body.
+    - Member functions with separated declaration and definition have to use the
+      const keyword in both the function prototype and definition.
+
+      class Foo {
+      private:
+          int m_value;
+      public:
+          Foo(int val = 0) : m_var{val};
+          void func1(int arg1);         // non-const member function.
+          void func2(int arg1) const;   // const member function.
+      };
+
+      Foo::Foo(int val = 0) : m_var{val} {};
+      void func1(int arg1) {}
+      void func2(int arg2) cons {       // declared as a const function.
+          std::cout << arg1 << std::endl;
+      }
+
+* A common way to create constant objects is by an object to a function by
+  constant reference.
+
+8.11 Static member variables
+----------------------------
+
+* static keyword (variables):
+    - Local variables:
+        + The variable retains its value and is not destroyed when it goes out
+          scope.
+
+    - Global variables:
+        + Restricts the use of the variable to the file where it is defined.
+
+* Two new uses in C++:
+    - static member functions.
+    - static member variables.
+
+* static member variables:
+    - Shared by all objects of the class.
+        + Not intrinsically associated with any class object.
+
+    - Must be explicitly defined outside of the class, in the global scope:
+        + The definition is not subject to access control, i.e., it does not
+          has to include the static keyword.
+        + But they also need to be declared inside the class.
+        + The exception of this rule is when the static member is of type
+          const int or const enum.
+
+    - They exist even if no objects of the class have been instantiated.
+        + They are created when the program starts and destroyed when it ends.
+        + Can be accessed using the class name and the scope resolution
+          operator, i.e., Foo::s_var = 2;
+
+      class Foo {
+      public:                              // Notice than these are public vars.
+          static int var;                  // declaration of the static member.
+          static const int s_exeption;     // exception to the rule.
+      }
+      // definition and initialization of the static member (no keyword).
+      Foo:: int var = 1;
+
+8.12 Static member functions
+----------------------------
+
+* As static variables, static functions belong to the class, not the any
+  particular instance:
+    - They can be called directly the class name and the scope resolution
+      operator (::), e.g., Foo::func();.
+
+* They do not have *this pointer (they have no class object to work with!).
+* They can ONLY access static member variables.
+* They can be defined inside or outside of the class:
+    - If defined outside, they should not be prefixed with the static keyword,
+      but their declaration within the class has to.
+
+  class Foo {
+  private:
+      static int m_var;            // declaration of static variable.
+  public:
+      static int func1(int arg1);
+      static int funt2(int arg2) {
+          // function body.
+      }
+  }
+  int Foo::m_var = 1;              // definition of static variable member.
+  int Foo::func1(int arg1) {       // definition of static function member.
+      // do something with m_var;
+  }
+  int main() {
+      Foo::func1();
+      return 0;
+  }
+
+* C++ does not support static constructors.
 
 
 
