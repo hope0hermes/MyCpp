@@ -1798,6 +1798,310 @@ Chapter 8. Basic object-oriented programming
 
 * C++ does not support static constructors.
 
+8.13 Friend functions and classes
+---------------------------------
+
+* Friend function:
+    - Function that can access the private members of a class as though it were
+      a member of that class.
+
+    - A friend function can be a normal function or a member function of another
+      class.
+
+    - They are declared using the "friend" keyword in front of the prototype of
+      the function you wish to be a friend of the class.
+
+        class Foo {
+        private:
+            int m_var;
+        public:
+            Foo() {m_var = 0;}
+            // make myFriend() a friend of this class.
+            friend void myFriend (Foo &foo);
+        };
+
+        // myFriend() is now a friend of the Foo class.
+        void myFriend(Foo &foo) {
+            foo.m_var = 0;  // it can directly access private members of foo.
+        }
+
+        int main() {
+            Foo foo;        // create an instance of Foo.
+            myFriend(foo);  // modify foo private members via a friend function.
+        }
+
+        + Notice that a Foo object had to be passed to myFriend() since, not
+          being a member function, it does not have a *this pointer to work
+          with.
+
+* Multiple friends:
+    - A function can be a friend of more than one class at the same time.
+    - This requires the declaration of class prototypes, telling the compiler
+      that classes used by myFriend() are to be defined latter on (except from
+      the first class using myFriend()).
+
+* Friend classes:
+    - An entire class can be friend of another class.
+    - All the members of the friend class have access to the private members of
+      the other class.
+
+        class Foo1 {
+        private:
+            int m_var;
+        public:
+            friend class Foo2;  // make the Foo2 class a friend of Foo1.
+        };
+
+        class Foo2 {
+        private:
+            int m_var;
+        public:
+            void func(Foo1 &foo1) {
+                foo1.m_var = 99;
+                std::cout<<foo1.m_var<<'\n';
+            }
+        };
+
+        int main() {
+            Foo1 foo1;
+            Foo2 foo2;
+            foo2.func(foo1);
+        }
+
+    - Important notes:
+        + Foo2 objects have NOT direct access to the *this pointer of Foo1
+          objects.
+        + Foo2 -> friend -> Foo1 does NOT imply Foo1 -> friend -> Foo2.
+        + A friend of B and B friend of C does not imply A friend of C.
+
+* Friend member functions:
+    - A single member function of one class can be friend of other classes.
+    - In this case, the use of the member function has to be done with the
+      className:: prefix included.
+    - To make a member function a friend, the compiler has to see the full
+      declaration of the class of the friend member function (not a mere forward
+      declaration).
+
+        class Foo2;         // forward declaration of class Foo2.
+
+        class Foo1 {
+        private:
+            int foo1_var;
+        public:
+            // forward declaration above needed for this declaration, which, in
+            // turn, will require to see the full declaration of Foo2.
+            void myFriend(Foo2 &foo2);
+        };
+
+        class Foo2 {
+        private:
+            int foo2_var;
+        public:
+            // make myFriend() a friend of Foo2. This requires seeing the full
+            // declaration provided above.
+            friend void Foo1::myFriend(Foo2 &foo2);
+        }
+
+        // now the friend function myFriend() can be defined. This requires
+        // having seen the full declaration of Foo2. This is the reason why the
+        // definition had to be done out of the Foo1 class.
+        void Foo1::myFriend(Foo2 &foo2) {
+            foo2.foo2_var = 0;
+        }
+
+    - A better solution is to put each class declaration in a separate header
+      file, with the function bodies in the corresponding .cpp files. That way,
+      all the class declarations would have been visible immediately and no need
+      of classes of functions rearrangements will be needed.
+
+8.14 Anonymous variables and objects
+------------------------------------
+
+* Anonymous variable:
+    - Variable that is given no name.
+    - They have expression scope.
+          return(5+3);  // creation of an anonymous int variable of value 8.
+
+* Anonymous objects:
+    - Objects with no name, created like normal objects but omitting the
+      variable name.
+
+* Anonymous objects are primarily used either to pass or return values without
+  having to create lots of temporary variables to do so.
+* Anonymous objects are treated as rvalues, i.e., they can only be passed or
+  returned by value or const reference.
+
+Chapter 9. Operator overloading
+===============================
+
+9.1 Introduction to operator overloading
+----------------------------------------
+
+* In C++ operators are implemented as functions.
+    - By using function overloading on the operator functions it is possible to
+      define customized operator acting on different data types.
+        + This procedure is called operator overloading.
+
+* Resolving overloaded operators:
+    - If all operand are fundamental data types, the compiler calls a built-in
+      routine if it exist (it produces an error if it does not exist).
+    - If any of the operand are user defined data types, the compiler will look
+      for an user defined matching operator:
+        + If not found, it will try to convert one or more user-defined data
+          type into fundamental data types, via an overloaded typecast.
+        + If it fails, a compiler time error is produced.
+
+* Limitations of operator overloading:
+    - With exception of the conditional (?:), sizeof, scope (::), member
+      selector (.) and member pointer selector (.*) operators, all the other
+      operator can be overloaded.
+    - New operators can't be created, only existing ones can be overloaded.
+    - At least one of the operands in an overloaded operator must be an
+      user-defined data type.
+    - It is not possible to change the number of operands an operator can
+      support.
+
+* Ways of overloading an operator:
+    - Via member functions.
+    - Via friend functions.
+    - Via normal functions.
+
+9.2 Overloading the arithmetic operators using friend functions
+---------------------------------------------------------------
+
+* All the arithmetic operators are binary operators.
+* Recipe to overload the +, -, * and / operators (example shown for +):
+    - Declare a function named "operator+"
+    - Declare it as taking two parameters of the classes we want to add and
+      returning the appropriate data type.
+
+          class Foo {
+          private:
+              int val;
+          public;
+              Foo(int val) : var{val} {}
+              // add Foo + Foo using the "operator+" friend function.
+              // although not recommended, the definition of the friend function
+              // is done within the class to save space.
+              friend Foo operator+(Foo &foo1, Foo &foo2) {
+                  // here, the Foo constructor and the operator+(int, int) are
+                  // used.
+                  return Foo(foo1.var + foo2.var);
+              }
+          };
+
+          int main() {
+              Foo foo1(1);
+              Foo foo2(2);
+              Foo res = foo1 + foo2;
+          }
+ * Overloaded operators may operate on operands of different types, for example,
+   - That process, however, is not commutative:
+
+      Cents(4) + Cents(4);    // will call Cents operator+(Cents, Cents)
+      Cents(4) + 4;           // will call Cents operator+(Cents, int)
+      4 + Cents(4);           // will call Cents operator+(int, Cents)
+      4 + 4;                  // will call Cents operator+(int, int)
+
+9.2a Overloading operators using normal functions
+-------------------------------------------------
+
+* In this case these is not direct access to the private members of the class we
+  are operating on. Instead, will rely on the call of a retrieving, public
+  function:
+
+    class Foo {
+    private:
+        int var;
+    public:
+        Foo(int val) : var{val} {}
+        int getVal() const {return var;}   // retrieving function.
+    };
+
+    // overload operator function. Notice that this is neither a member function
+    // nor a friend function.
+    Foo operator+(Foo &foo1, Foo &foo2) {
+        return Foo(foo1.getVal() + foo2.getVal());
+    }
+
+    int main() {
+        Foo foo1(1);
+        Foo foo2(2);
+        Foo foo3 = foo1 + foo2;
+    }
+* The main difference between friend and normal operator function overloading is
+  that, in the friend case, the declaration of the friend function inside the
+  class, also serves a prototype. With the normal function version, an
+  additional function prototype as to be provided.
+
+* The use of normal function overloading is preferred over that of friend
+  functions.
+
+9.3 Overloading I/O operators
+-----------------------------
+
+* Usually done to print several object members at once.
+* Done by overloading the << operator, whose left operand is the std::cout
+  object and the right operator is the desired class instance.
+* Overloading the << operator via a friend function will look like this:
+
+    class Foo{
+    private:
+        int x;
+        int y;
+    public:
+        Foo(int val1, int val2) : x{val}, y{val2} {}
+        friend std::ostream& operator<<(std::ostream &out, Foo &foo);
+    };
+    std::ostream& operator<<(std::ostream &out, Foo &foo){
+        out << "(x, y) = (" << foo.x << ", " << foo.y << ")\n";
+        return out;
+    }
+    int main() {
+        Foo foo(2,3);
+        std::cout << foo;
+    }
+
+    - In this case, the left hand argument is returned as a reference.
+        + This allows the overloaded operator to be chainable.
+
+* The >> operator is overloaded in a similar way.
+    - The only difference is that, in this case, we pass std::cin, which is an
+      object of type std::istream.
+
+9.4 Overloading operators using member functions
+------------------------------------------------
+
+* The recipe in this case is similar to that followed with friend functions:
+* When overloading an operator using a member function:
+    - The overloaded operator must be added as a member function of the left
+      operand.
+    - The left operand becomes the implicit *this object.
+    - All the other operands become function parameters.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
