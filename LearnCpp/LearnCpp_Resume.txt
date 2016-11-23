@@ -2310,27 +2310,129 @@ Chapter 9. Operator overloading
 9.9 Overloading the parenthesis operator
 ----------------------------------------
 
+* This operator has to be overloaded via a member function.
+* Allow to vary both the type and number of operands.
+* The operator() is commonly overloaded to implement functors:
+    - Classes that operate like functions:
+    - The advantage of functors over normal functions is that they can store
+      data in member variables.
 
+      class Matrix {
+      private:
+          double var[4][4];
+      public:
+          Matrix() { // constructor code. }
+          // overloaded versions of the operator() function.
+          double& operator()(int row, int col);
+          void operator()();
+      };
+      // version taking two integer arguments and returning reference to double.
+      double& Matrix::operator()(int row, int col) {
+          return var[row][col];
+      }
+      // version without arguments and returning void.
+      void Matrix::operator()() {
+          for(int row=0; row<4; row++) {
+              for(int col=0; col<4; col++) var[row][col] = 0.;
+          }
+      }
 
+      int main() {
+          Matrix mat();
+          mat();                // reset matrix.
+          mat(2,3) = 6.343;     // set var[2][3].
+      }
 
+9.10 Overloading typecast
+-------------------------
 
+* Overloading the typecast operator allows to convert our defined class objects
+  into another data types.
+* The casting operator does not have a return type.
 
+    class Cents{
+    private:
+        int var;
+    public:
+        Cents(int val) : var{val} {}
+        operator int() { return var; }
+    }
+    int printCents(int val) {
+        std::cout << val << '\n';
+    }
+    int main() {
+        Cents cents(5);
+        // printCents expects an int arguments, but a Cents argument is provided
+        // instead, then the typecast operator will be called.
+        printCents(cents);
+    }
 
+    - Once the typecast operator is overloaded, explicit cast can be invoked:
+        + int c = static_cast<int>(cents);
 
+* Overloading the typecast operator is not restricted to primitive data types:
 
+    class Dollars {
+    private:
+        int val;
+    public:
+        Dollars(int val) : var{val} {}
+        operator Cents() { return var * 100; }
+    };
+    // this function expects a Cents argument.
+    void printCents(Cents cents) {
+        std::cout << cents << '\n';
+    }
+    int main() {
+        Dollar dls(3);
+        // this functions expects a Cents argument, then Cents() typecast will
+        // be called.
+        printCents(dls);
+    }
 
+9.11 The copy constructor
+-------------------------
 
+* Recap on initialization:
+    - int x{3};         // uniform.
+    - int x(3);         // direct.
+    - int x = 3;        // copy.
 
+* Copy constructor:
+    - Special type of constructor used to create a new object as a copy of an
+      existing object.
+    - If this constructor is not explicitly provided, C++ will provide a default
+      one.
+        + This constructor uses membership initialization:
+            : Each member of the copy will be initialized directly from the
+              member of the class being copied.
 
+    - An explicit copy constructor can be provided in C++:
 
+        class Foo {
+        private:
+            int var1;
+            int var2;
+        public:
+            // default constructor (not a copy default, though).
+            Foo(int val1=1, val2=2) : var1{val1}, var2{val2} {}
+            // overloaded copy constructor.
+            // in this case the private members of the passed in parameter foo
+            // can be directly accessed since we are inside of the class!.
+            Foo(const Foo &foo) : var1{foo.var1}, var2{foo.var2} {}
+        }
 
+        int main() {
+            Foo foo1(1, 2);     // default constructor is called.
+            Foo foo2(foo1);     // overloaded copy constructor is called.
 
+        }
 
+        + An important point to notice here is that member functions of a class
+          can access the private members of the parameters of the SAME class
+          type.
 
+* Copies of the class can be prevented by making the copy constructor private.
 
-
-
-
-
-
-
+9.13 Converting constructors, explicit, and delete
+--------------------------------------------------
