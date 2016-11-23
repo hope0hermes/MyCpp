@@ -1769,7 +1769,7 @@ Chapter 8. Basic object-oriented programming
 
 * As static variables, static functions belong to the class, not the any
   particular instance:
-    - They can be called directly the class name and the scope resolution
+    - They can be called directly using the class name and the scope resolution
       operator (::), e.g., Foo::func();.
 
 * They do not have *this pointer (they have no class object to work with!).
@@ -2079,17 +2079,236 @@ Chapter 9. Operator overloading
     - The left operand becomes the implicit *this object.
     - All the other operands become function parameters.
 
+      class Foo {
+      private:
+          int m_var;
+      public:
+          Foo(int init) : m_var{init} {}
+          // overloading the Foo + int operator.
+          Foo operator+(int val);
+      };
+      // Notice that this is a member function (defined out of the class
+      // declaration).
+      // in this case, the left Foo parameter becomes the implicit *this pointer
+      Foo Foo::operator+(int val) {
+          return Foo(m_var + val);
+      }
 
+      int main() {
+          Foo foo1(1);
+          Foo foo2 = foo1 + 2;
+      }
 
+* Not every operator can be overloaded as a friend function:
+    - The assignment (=), subscript ([]), function call (()) and member select
+      (->) operators have to be overloaded as member functions.
 
+* Not everything can be overloaded as a member function:
+    - Examples of this are the <<, >> and operator+(int, Foo), since
+      std::ostream, std::istream and int, aren't classes we can add members to.
 
+* When to use normal, friend of member function overload?
+    - Normal / friend version:
+        + When dealing with binary operator that do not modify the left operand.
+        + Since they work for all parameter types.
+        + They are symmetric on all operands
 
+    - Member function version:
+        + When dealing with binary operators that do modify the left operand.
+        + In these cases the left most operand is always a class type and the
+          object being modified is pointed by the implicit *this pointer.
+        + In this case there is no confusion on which operand is being modified.
 
+    - Unary operators are usually overloaded as member functions, since the
+      member version has no parameters
 
+9.5 Overloading unary operators +, - and !
+------------------------------------------
 
+* These operators only operate in one operand.
+    - They are typically implemented as member functions.
 
+* The prototypical overloading method is as follows:
 
+      class Foo {
+      private:
+          int var;
+      public:
+          Foo(int val) : var{val} {}
+          // overload -Foo as a member function.
+          Foo operator-() const;
+      };
+      // Definition of the overloaded member function -Foo.
+      Foo Foo::operator-() const{
+          return Foo(-var);
+      }
+      int main() {
+          Foo foo1(1);
+          Foo foo2 = -foo1;
+      }
 
+9.6 Overloading the comparison operators
+----------------------------------------
+
+* They follow exactly the same procedure than the binary, arithmetic operators.
+* Since these are binary operators that do not modify the left operand, they
+  would be preferably overloaded via friend functions.
+
+    class Foo {
+    private:
+        int var;
+    public:
+        Foo(int val) : var{val} {}
+        friend bool operator==(const Foo &foo1, const Foo &foo2);
+        friend bool operator!=(const Foo &foo1, const Foo &foo2);
+    };
+    bool operator==(const Foo &foo1, const Foo &foo2) {
+        return foo1.var && foo2.var;
+    }
+    bool operator!=(const Foo &foo1, const Foo &foo2) {
+        return !(foo1 == foo2);
+    }
+    int main() {
+        Foo foo1(1);
+        Foo foo2(1);
+        if(foo1 == foo2) return 0;
+        else if(foo1 != foo2) return 1;
+    }
+
+9.7 Overloading the increment and decrement operators
+-----------------------------------------------------
+
+* These are unary operators that modify its operand
+    - Therefore, they are preferably overloaded via member functions.
+
+* Overloading the prefix version:
+
+    class Foo {
+    private:
+        int var;
+    public:
+        Foo(int val) : var{val} {}
+        Foo& operator++();
+    }
+    Foo& Foo::operator++() {
+        ++var;
+        return *this;
+    }
+    int main() {
+        Foo foo(0);
+        ++foo;
+    }
+
+    - In this case, the current implicit object is returned (*this) to allow
+      multiple operations chained together.
+
+* Overloading the postfix version:
+
+    - C++ requires the use of a "dummy argument" to overload the postfix
+      operator:
+        + Otherwise the prefix and postfix operator functions would have exactly
+          the same declaration.
+
+    class Foo {
+    private:
+        int m_var;
+    public:
+        Foo(int val) : m_var{val} {}
+        // here, the int argument is the dummy argument.
+        Foo operator++(int);
+    }
+    Foo Foo::operator++(int) {
+        // create a temporary variable with the current value.
+        Foo temp(m_var);
+        ++(*this);      // I guess this is the same than ++m_var;
+        // return a copy of the state before incrementing.
+        return temp;
+    }
+    int main() {
+        Foo foo(0);
+        foo++;
+    }
+
+    - Because of the additional overhead of instantiating a temporary variable,
+      the postfix operator is less efficient.
+    - Also notice that the postfix operator can return a reference to the
+      temporary variable, since it would go out of scope when the function
+      exits.
+
+9.8 Overloading the subscript operator ([])
+-------------------------------------------
+
+* This operator have to be overloaded via member functions.
+* An overloaded operator[] function will ALWAYS take one parameter:
+    - The subscript that the user places between that hard braces.
+        + Not necessary an integer.
+
+* Because the result of operator[] can be used on the left hand side of an
+  assignment, the return value of the operator[] must be an l-value (such as
+  references).
+
+    class Foo {
+    private:
+        int m_list[10];
+    public:
+        int& operator[] (const int index);
+    };
+    int& Foo::operator[] (const int index) {
+        return m_list[index]
+    }
+
+* The subscript operator[] can be overloaded in two flavors, const and
+  non-const:
+    - The const version can be used for assignment.
+    - The non-const version would rather be used for access.
+    - When the const and non-const versions are defined separately, the compiler
+      will select the appropriate version depending on the type of the operand:
+
+        class Foo {
+        private:
+            int m_list[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        public:
+            int& operator[] (int index);        // non-const version.
+            const int& operator[] (int index);  // const version.
+        };
+        int& Foo::operator[] (int index) {
+            assert(index > 0 && index < 10);    // check index out of bounds.
+            return m_list[index];
+        }
+        const int& Foo::operator[] (int index) { return m_list[index]; }
+        int main() {
+            Foo fooN;       // non const instance.
+            Foo fooC;       // const instance.
+            fooN[2] = 3;    // calls non-const version changing value.
+            fooC[2] = 3;    // this will produce a compiling time error.
+            std::cout << fooC[2] << '\n' // calling const version and printing.
+        }
+
+* A good reason to overload the subscript operator[] is to prevent index out of
+  bounds.
+* When calling the operator[] on a pointer to an object, C++ will assume we are
+  trying to index an array of objects of that type.
+    - To deal with such cases, the pointer has to be dereferenced first:
+
+      Foo *foo = new Foo;
+      // error: next line will assume access to 2nd index in array of Foo's.
+      foo[2] = 3;
+      // next line access the 2nd element in m_list.
+      (*foo)[2] = 3;        // still ugly and error prone.
+
+* The operator[] function parameter does not has to be an integer:
+
+      void Stupid::operator[] (std::string index) {
+          std::cout << index << '\n';
+      }
+
+      int main() {
+          Stupid stupid;
+          stupid["this is an stupid overload"];
+      }
+
+9.9 Overloading the parenthesis operator
+----------------------------------------
 
 
 
