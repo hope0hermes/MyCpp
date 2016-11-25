@@ -1,4 +1,4 @@
-﻿Chapter 1. C++ Basics
+Chapter 1. C++ Basics
 =====================
 
 1.1 Structure of a program
@@ -2310,129 +2310,460 @@ Chapter 9. Operator overloading
 9.9 Overloading the parenthesis operator
 ----------------------------------------
 
-* This operator has to be overloaded via a member function.
-* Allow to vary both the type and number of operands.
-* The operator() is commonly overloaded to implement functors:
-    - Classes that operate like functions:
-    - The advantage of functors over normal functions is that they can store
-      data in member variables.
+* The operator() allows to vary both the type and number of arguments it takes.
+* The parenthesis operator must be implemented as a member function.
+* In non-object oriented C++, the parenthesis operator is used to call
+  functions.
+* In the case of classes, the operator() is just a normal operator that calls a
+  function (named operator()), just like any other overload operator.
+* This operator is commonly used to implement functors:
+    - Classes that operate like functions.
+      + The advantage of functors over normal functions is that they can store
+        data in member variables.
 
-      class Matrix {
-      private:
-          double var[4][4];
-      public:
-          Matrix() { // constructor code. }
-          // overloaded versions of the operator() function.
-          double& operator()(int row, int col);
-          void operator()();
-      };
-      // version taking two integer arguments and returning reference to double.
-      double& Matrix::operator()(int row, int col) {
-          return var[row][col];
-      }
-      // version without arguments and returning void.
-      void Matrix::operator()() {
-          for(int row=0; row<4; row++) {
-              for(int col=0; col<4; col++) var[row][col] = 0.;
-          }
-      }
-
-      int main() {
-          Matrix mat();
-          mat();                // reset matrix.
-          mat(2,3) = 6.343;     // set var[2][3].
-      }
+    class Foo {
+    private:
+        double mat[4][4];
+    public:
+        Foo() { // matrix initialization. }
+        // overloading operator() which returns a reference and takes 2 int's.
+        double& operator(int row, int col);
+        // overloading operator() that takes no arguments and returns void.
+        void operator()();
+    };
+    // implementation which returns reference and takes 2 int's.
+    double& Foo::operator()(int row, int col) {
+        assert(row < 4 && col < 4);
+        assert(row >= 0 && col >= 0);
+        return mat[row][col];
+    }
+    // implementation that returns void and takes no arguments.
+    void Foo::operator()() {
+        for(int row=0; row<4; row++) {
+            for(int col=0; col<4; col++) mat[row][col] = 0.;
+        }
+    }
+    int main() {
+    Foo mat();
+    mat();              // reset all entries.
+    mat(3, 2) = 9.0;    // set specific entry.
+    }
 
 9.10 Overloading typecast
 -------------------------
 
-* Overloading the typecast operator allows to convert our defined class objects
-  into another data types.
-* The casting operator does not have a return type.
+* Allow to convert class instances into another data types.
+* Casting operators do not have a returns type.
+* When the compiler sees a function takes an argument of a certain type "Typ".
+  It 1st looks if there is an user provided function to convert the passed in
+  argument into "Typ" and calls the corresponding typecast operator.
 
     class Cents{
     private:
-        int var;
+        int c_var;
     public:
-        Cents(int val) : var{val} {}
-        operator int() { return var; }
-    }
-    int printCents(int val) {
-        std::cout << val << '\n';
-    }
-    int main() {
-        Cents cents(5);
-        // printCents expects an int arguments, but a Cents argument is provided
-        // instead, then the typecast operator will be called.
-        printCents(cents);
-    }
-
-    - Once the typecast operator is overloaded, explicit cast can be invoked:
-        + int c = static_cast<int>(cents);
-
-* Overloading the typecast operator is not restricted to primitive data types:
+        Cents() { // constructor code. }
+        // overloaded int cast.
+        operator int() { return c_var; }
+    };
 
     class Dollars {
     private:
-        int val;
+        int d_var;
     public:
-        Dollars(int val) : var{val} {}
-        operator Cents() { return var * 100; }
+        Dollars() { // constructor code. }
+        // overloaded Cents() cast (converts dollars into cents).
+        operator Cents() { return Cents(d_var * 100); }
     };
-    // this function expects a Cents argument.
+
     void printCents(Cents cents) {
-        std::cout << cents << '\n';
+        std::cout << cents;     // Cents will be implicitly cast to an int here.
     }
+
     int main() {
-        Dollar dls(3);
-        // this functions expects a Cents argument, then Cents() typecast will
-        // be called.
-        printCents(dls);
+        Dollars doll(4);
+        printCents(doll);   // Dollars will be implicitly cast to Cents here.
     }
+
+    - Explicit cast of the overloaded typecast operator can be called:
+
+        Cents cents(7);
+        int c = static_cast<int>(cents);
 
 9.11 The copy constructor
 -------------------------
 
-* Recap on initialization:
-    - int x{3};         // uniform.
-    - int x(3);         // direct.
-    - int x = 3;        // copy.
+* Recap of types initialization;
+    - int var(1);   // direct initialization.
+    - int var{1};   // uniform initialization.
+    - int var = 1;  // copy initialization.
 
-* Copy constructor:
+* The copy constructor:
     - Special type of constructor used to create a new object as a copy of an
-      existing object.
-    - If this constructor is not explicitly provided, C++ will provide a default
-      one.
-        + This constructor uses membership initialization:
-            : Each member of the copy will be initialized directly from the
-              member of the class being copied.
+      existing one.
+    - C++ provides a copy constructor by default, which does a memberwise
+      initialization:
+        + Each member of the copy is initialized directly form the member of the
+          class being copied.
 
-    - An explicit copy constructor can be provided in C++:
+    - The copy constructor may directly access the private members of
+
+    - A user defined copy constructor is provided as follows:
 
         class Foo {
         private:
             int var1;
             int var2;
         public:
-            // default constructor (not a copy default, though).
-            Foo(int val1=1, val2=2) : var1{val1}, var2{val2} {}
-            // overloaded copy constructor.
-            // in this case the private members of the passed in parameter foo
-            // can be directly accessed since we are inside of the class!.
-            Foo(const Foo &foo) : var1{foo.var1}, var2{foo.var2} {}
-        }
+            // default constructor.
+            Foo(int val1=1, int val2=2) : var1{val1}, var2{val2} {}
+            // copy constructor.
+            Foo(Foo &foo) : var1{foo.var1}; var2{foo.var2;} {}
+        };
 
         int main() {
-            Foo foo1(1, 2);     // default constructor is called.
-            Foo foo2(foo1);     // overloaded copy constructor is called.
-
+            Foo foo1(2,3);      // calling the default constructor.
+            Foo foo2(foo1);     // calling the copy constructor.
         }
 
-        + An important point to notice here is that member functions of a class
-          can access the private members of the parameters of the SAME class
-          type.
+    - An important thing to notice is that member functions of a class can
+      access the private members of parameters of the class of the same type.
 
-* Copies of the class can be prevented by making the copy constructor private.
+* Preventing the copy of instances of a particular class can be done by:
+    - Making the copy constructor private.
 
-9.13 Converting constructors, explicit, and delete
---------------------------------------------------
+* The copy constructor may be elided:
+    - Foo foo(Foo(1,2));  // <--- this is a tricky line.
+    - Though the previous line will formally take two steps:
+        + Create an anonymous object calling the default constructor.
+        + Then calling the copy constructor using the anonymous object.
+
+    - The compiler OPTED to perform a single step by directly call the default
+      constructor, using the passed in arguments, i.e., Foo foo(1,2);
+        + This process is called "eliding".
+
+9.12 Copy initialization
+------------------------
+
+* There is no constructor to overload in this case. You simply have to
+  initialize the object as: Foo foo = Foo(4), which is effectively as
+  Foo foo(Foo(4)).
+    - Copy initialization is prone to be elided.
+        + Copy initialization should be avoided if possible.
+
+* Occasions when copy initialization is used:
+    - When passing of returning a class by value.
+
+9.13 Converting constructors, explicit and delete
+-------------------------------------------------
+
+* By default C++ will treat any constructor as an implicit converting
+  constructor.
+
+    class Foo {
+    private:
+      int var;
+
+    public:
+        // default constructor taking integers.
+        Foo(int val=1) : var1{val1} {}
+        // copy constructor.
+        Foo(const Foo &foo) : var1{foo.var1}, var2{foo.var2} {}
+        // member functions setting and getting one of the private variables.
+        void f_set(int val) { var = val; }
+        int f_get() { return var; }
+    }
+    // bad written function, returning and taking Foo by value.
+    int makeNegative(Foo foo) {
+        foo.f_set(-foo.f_get());
+        return foo.f_get();
+    }
+    int main() {
+        // notice that int is passed instead of Foo.
+        std::cout << makeNegative(3);
+    }
+
+    - Because Foo as a constructor taking a single integer, the compiler will
+      use this constructor to implicitly convert integer 6 into a Foo object,
+      which will then be copy initialized into makeNegative().
+
+* Converting constructor:
+    - Constructors eligible to be used for implicit conversion.
+
+* The default implicit conversion character of a constructor can be overridden
+  by using the "explicit" keyword before the constructor name:
+    - This only prevents the implicit conversion, but explicit conversions are
+      still possible
+        + For instance using direct initialization.
+
+* To fully prevent the use of a constructor as a conversion operator it is
+  necessary to use the delete keyword:
+
+    Foo(char) = delete;    // any use of this constructor will produce an error.
+
+9.14 Overloading the assignment operator
+----------------------------------------
+
+* The assignment operator is used to copy values from one object to another
+  already existing object.
+* The assignment operator must be overloaded as a member function:
+
+    class Foo {
+    private:
+        int var;
+    public:
+        // default constructor.
+        Foo(int val=1) : var{val1} {}
+        // copy constructor.
+        Foo(const Foo &foo) : var{foo.var} {}
+        // overloaded assignment.
+        Foo& operator=(const Foo &foo);
+    }
+    // implementation of the overloaded assignment operator.
+    Foo& Foo::operator=(const Foo &foo) {
+        var = foo.var;
+        // return the existing object so that the operator can be chained.
+        return *this;
+    }
+    int main() {
+        Foo foo1(1);
+        Foo foo2;
+        foo2 = foo1;
+    }
+
+* In C++ it is possible to assign an object to itself, i.e., foo = foo.
+    - This is potentially dangerous when Foo has dynamically allocated members.
+    - Self assignment can be easily detected by checking if the passed in
+      parameter and the current instance (implicit *this) point to the same
+      object:
+
+          Foo& Foo::operator=(const Foo &foo) {
+              if(this == &foo) {
+                  return *this;
+              }
+              // do whatever.
+              return *this;
+          }
+
+* C++ provides a default assignment operator which does memberwise assignment.
+* Preventing assignment of the class can be achieved by:
+    - Making the assignment operator private.
+    - Using the delete keyword, i.e., Foo(const Foo &foo) = delete;
+
+9.15 Shallow vs deep copying
+----------------------------
+
+* Shallow copy (memberwise copy or assignment operators):
+    - Copies each member of the class individually.
+    - Shallow copies of a pointer will just copy the ADDRESS of the pointer,
+      i.e.:
+        + Will not allocate memory or copy the contents being pointed to!!!
+
+    - Assume MyString includes a constructor and destructor which allocate and
+      free memory for a simple string.
+
+        int main() {
+            MyString myStr("Que buena vaina!");
+            {
+                // the default copy constructor will be used, therefore cpStr
+                // and myStr will point to the same address.
+                MyString cpStr = myStr;
+                // after this comment, cpStr will goes out of scope and the
+                // destructor will be called, freeing the memory used by both
+                // cpStr and myStr.
+            }
+            // at this point the string in myStr will be a DANGLING pointer!!!
+        }
+
+    - Doing a shallow copy of object with dynamic memory will always be asking
+      for troubles.
+
+* Deep copy:
+    - Allocates memory for the copy and then copies the actual values;
+        + The copy lives in a different memory address.
+
+    - Deep copy requires us to provide explicit copy constructors and assignment
+      operators:
+    - Any previous dynamically allocated memory has to be explicitly freed
+      before allocating new memory.
+        + If we don't do so, the code may still run, but there will be memory
+          leaks.
+
+Chapter 10. An introduction to object relationships
+===================================================
+
+10.2 Composition
+----------------
+
+* Broadly speaking, object composition models a "has-a" relationship between two
+  objects.
+    - More precisely, it defines a PART-OF relationship.
+
+* To qualify as a composition, the "object" and the "part" need to fulfill these
+  criteria:
+    - The part (member) is a part of the object (class).
+    - The part (member) can only belong to one object (class) at a time.
+    - The part (member) has its existence managed by the object (class).
+    - The part (member) does not know about the existence of the object (class).
+      This is a unidirectional relationship.
+
+* An analogy of composition is that of a body part and the whole body.
+* In a composition relationship the object is responsible for the existence of
+  the part:
+    - It manages the part's lifetime is such a way that the user of the object
+      does not need to get involved.
+
+* Composition does not impose any restriction about the transferability of the
+  parts.
+
+* Implementation:
+    - Composition are typically created as structs of classes with normal data
+      members.
+    - Composition that needs dynamic memory may be implemented using pointer
+      data members.
+        + In this case the composition should be responsible for doing all the
+          necessary memory management itself.
+
+    - If a class CAN be designed using composition, then it SHOULD do so.
+
+* Example of composition:
+
+    Point2D.h
+        #ifndef POINT2D_H
+        #define POINT2D_H
+        #include <iostream>
+
+        class Point2D {
+        private:
+            int m_x, m_y;
+        public:
+            // default constructor.
+            Point2D(int x=0, int y=0) : m_x{x}, m_y{y} {}
+            // access function.
+            void setPoint(int x, int y) {
+                m_x = x;
+                m_y = y;
+            }
+        };
+
+        #endif
+
+    Creature.h
+
+        #ifndef CREATURE_H
+        #define CREATURE_H
+        #include <iostream>
+        #include <string>
+        #include "Point2D.h"
+
+        class Creature {
+        private:
+            std::string m_name;
+            Point2D m_pos;
+        public:
+            // default constructor.
+            Creature(std::string name, const Point2D &pos) :
+                m_name{name}, m_pos{pos} {}
+            // moving function.
+            void moveTo(int x, int y) {
+                m_pos.setPoint(x, y);
+            }
+        };
+
+        #endif
+
+    Main.cpp:
+
+        #include <string>
+        #include <iostream>
+        #include "Creature.h"
+        #include "Point2D.h"
+
+        int main() {
+            Creature mostro("babalukas", Point(666,666));
+            mostro.moveTo(999,999);
+            return 0;
+        }
+
+* Variants of composition:
+    - A composition may defer creation of some parts until they are needed.
+    - A composition may opt to use a part that has been given to it as input
+      rather than create the part itself.
+    - A composition may delegate destruction of its parts to some other object.
+
+* Composition and subclasses:
+    - Each individual class should be kept as simple as possible, focusing on
+      performing one single task.
+    - Each subclass can be self-contained, which makes them reusable.
+    - The parent class can have the subclasses do most of the hard work, and
+      instead focus on coordinating the data flow between the subclasses.
+
+10.3 Aggregation
+----------------
+
+* Aggregation is a part-whole relationship.
+    - More precisely, it represents a HAS-A relationship.
+
+* To qualify as a composition, the "object" and the "part" need to fulfill these
+  criteria:
+    - The part (member) is part of the object (class).
+    - The part (member) can belong to MORE that one object (class) at a time.
+    - The part (member) does NOT have its existence managed by the object
+      (class).
+    - The part (member) does not know about the existence of the object (class).
+      this is a unidirectional relationship.
+
+* An analogy of an aggregation is that between teachers and the school.
+* When an aggregation is destroyed, the aggregation is not responsible
+  destroying the parts.
+* Implementation:
+    - Similar to that of compositions.
+    - In this case, member variables are typically REFERENCE or POINTERS:
+        + Pointing to objects created out of the scope of the class.
+
+    - Members are initialized by:
+        + Passing objects to be pointed as constructor parameters.
+        + Assigned after instantiation via access functions.
+
+* Example:
+
+    class Teacher {
+    private;
+        std::string m_name;
+    public;
+        Teacher(std::string name) : m_name{name} {}
+        std::string getName() { return m_name; }
+    };
+    class Department {
+    private:
+        Teacher *m_teach;    // this department has only one member for clarity.
+    public:
+        Department(Teacher *teacher=NULL) : m_teach{teacher} {}
+    };
+    int main() {
+        // create a teacher outside the scope of the department.
+        Teacher *teach = new Teacher("Hipolito");
+        {
+            // create a department and use the constructor parameter to pass the
+            // teacher to it.
+            Department dept(teach);
+        }   // dept goes out of scope at this point.
+        // but the teacher still exists.
+        std::cout << teach->getName();
+        return 0;
+    }
+
+* Aggregation or composition?
+    - As a rule of thumb, implement the simplest relationship type that meets
+      the needs of your program, not what seems right in the real life.
+    - Since aggregations do not handle deallocation, they are more prone to be
+      misused by the final user of the class.
+        + When possible, prefer the use of composition over aggregation.
+
+10.4 Association
+----------------
+
+
+
+
+
