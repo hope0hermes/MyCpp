@@ -2763,6 +2763,315 @@ Chapter 10. An introduction to object relationships
 10.4 Association
 ----------------
 
+* Association models a "USES-A" relationship, like that between doctor and
+  patient:
+    - The doctor uses the patient (to earn income) and the patient uses the
+      doctor (for health purposes).
+
+* To qualify as an association, an object and another object must fulfill the
+  following relationship:
+    - The associated object (member) is otherwise unrelated to the object
+      (class).
+    - The associated object (member) can belong to more than one object (class)
+      at a time.
+    - The associated object (member) does NOT have its existence managed by the
+      object (class).
+    - The associated object (member) may or may not know about the existence of
+      the object (class). This relationship can be BIDIRECTIONAL.
+
+* Associations are a broad type of relationship and their implementation can be
+  made in many different ways:
+
+    - Bi-directional, doctor/patient relationship:
+
+        // forward declaration due to the circular relationship between classes.
+        class Doctor;
+
+        class Patient {
+        private:
+            std::string m_name;
+            std::vector<Doctor *> m_doctor;
+
+            void addDoctor(Doctor *doc);
+        public:
+            Patient(std::string name) : m_name{name} {}
+            std::string getName() const {return m_name};
+            // friending doctor, so that it has access to "addDoctor()".
+            friend Doctor;
+        };
+
+        class Doctor {
+        private:
+            std::string m_name;
+            std::vector <Patient *> m_patient;
+        public:
+            Doctor(std::string name) : m_name{name} {}
+            void addPatient(Patient *pat) {
+                m_patient.push_back(pat);   // the doctor adds the patient.
+                pat->addDoctor(this);       // the patient adds the doctor.
+            }
+        };
+
+        void Patient::addDoctor(Doctor *doc) { m_doctor.push_back(doc); }
+
+        int main() {
+            Patient *p1 = new Patient("Dave");
+            Patient *p2 = new Patient("Jane");
+
+            Doctor *d1 = new Doctor("Haus");
+            Doctor *d2 = new Doctor("Strange");
+
+            d1->addPatient(p1);     // dr house has only one patient.
+            d2->addPatient(p1);     // dr strange has two patients.
+            d2->addPatient(p2);
+            return 0;
+        }
+
+        + When possible, bidirectional associations should be avoided, since
+          they add complexity and are more prone to errors.
+
+    - Reflexive association:
+        + Relationship between two objects of the same type.
+
+        class Course {
+        private:
+            Course *m_preCourse;
+        public:
+            Course(Course *preCourse = nullptr) : m_preCourse{preCourse}
+        };
+
+* Composition vs association summary:
+
+    Property                  Composition   Aggregation   Association
+    ========================  ============  ============  =============
+    Relationship type?        Whole / Part  Whole / Part  Whole / Part
+    Members of many objects?  No            Yes           Yes
+    Class ctrl existence?     Yes           No            No
+    Directionality?           Unidir        Unidir        Unidir / Bidir
+    Relationship verb?        Part-of       Has-a         Uses-a
+
+10.5 Dependencies
+-----------------
+
+* A dependency occurs when one object invokes another's object functionality in
+  order to accomplish come specific task.
+
+* A good a analogy of dependency is when classes use std::cout to write its
+  content on the console, but not the other way around.
+
+* Difference from association:
+    - Associations are relationships between two classes at the class level:
+        + One class has a link to the associate class as a member.
+
+    - Dependencies are not represented at the class level:
+        + The dependent object is not linked as a member.
+        + It is rather instantiated as needed or passed into a function as a
+          parameter.
+
+10.6 Container classes
+----------------------
+
+* Class designed to hold and organize multiple instances of another type.
+* Typical functionality implemented by container classes:
+    - Create an empty container.
+    - Insert and remove objects.
+    - Keep track of the number of members.
+    - Provide access to objects.
+    - Sort elements.
+
+* Container classes implement a "MEMBER-OF" relationship
+* Types of containers;
+    - Value containers:
+        + Compositions that store copies of the objects that they are holding.
+
+    - Reference containers:
+        + Aggregations that store pointers of references to other objects.
+
+    - Containers typically only hold ONE type of data.
+
+Chapter 11. Inheritance
+=======================
+
+11.1 Introduction to inheritance
+--------------------------------
+
+* Models an "IS-A" relationship between objects.
+    - It involves creating new objects by directly acquiring the attributes and
+      behaviors of the other objects and then extending or specializing them.
+
+* Hierarchies;
+    - Diagram that show how various objects are related.
+
+* Parent class:
+    - The object being inherited from.
+
+* Child class:
+    - Object doing the inheriting.
+
+11.2 Basic inheritance in C++
+-----------------------------
+
+* Inheritance takes place between two classes:
+    - The parent and the child class.
+
+* Inheritance syntax:
+
+    class ChildClass : public ParentClass {
+        // class body.
+    };
+
+* Member variables and functions of the child class, will be those defined by
+  its own, plus those defined by the parent class.
+* Inheritance chains:
+    - It is possible to inherit from a class that is itself derived from
+      another class.
+    - There is nothing special or tricky on doing so.
+    - Inheritance chains allow the creation of reusable classes that are very
+      general and progressively become more specific.
+
+11.3 Order of construction of derived classes
+---------------------------------------------
+
+* The derived or child class can be though of as comprising two parts:
+    - A base part.
+    - A derived part.
+
+* When C++ constructs a derived object, it does so partwise:
+    - 1st the most-base class is constructed.
+    - Then the child class is constructed in order, until the most-child class
+      is constructed last.
+
+11.4 Constructors and initialization of derived classes
+-------------------------------------------------------
+
+* Derived classes can not access private members of the Base class directly.
+    - These members have to be accessed via access functions!!!
+
+* Process for the instantiation of a Base object;
+    - Memory for a Base object is set aside.
+    - The appropriate Base constructor is called.
+    - The initialization list initialized the variables.
+    - The body of the constructor is executed.
+    - Control is returned to the caller.
+
+* Process for the instantiation of a Derived object;
+    - Memory for a Derived object is set aside (enough for both the Base and
+      Derived portions).
+    - The appropriate derived constructor is called.
+    - The Base object is constructed first using the appropriate Base
+      constructor.
+        + If no base constructor is specified, the default constructor will be
+          used.
+
+    - The initialization list initializes variables.
+    - The bod of the constructor executes.
+    - Control is returned to the caller.
+
+* Initializing Base class members:
+    - The value of a variable can only be set in an initialization list of a
+      constructor belonging to the same class as the variable.
+        + So that each variable is initialized ONLY once:
+            : The Base constructor (and its initialization list) is called
+              before the initialization list of the Derived class is applied!!!
+            : This was specially though for const variables and references.
+
+    - To deal with this, a customized constructor for the Base class may be
+      called in the initialization list of the Derived class.
+
+    class Base {
+    private:
+        int m_base;
+    public:
+        Base(int val=0) : m_base{val} {}
+    };
+
+    class Derived {
+    private:
+        int m_deriv;
+    public:
+        Derived(int val_deriv=0, int val_base=1) :
+            Base(val_base), m_deriv{val_deriv} {}
+    };
+
+* Destructors:
+    - When a derived class is destroyed, each constructor is called in the
+      reverse order of construction.
+
+11.5 Inheritance and access specifiers
+--------------------------------------
+
+* Remainder from previous lessons:
+    - Public members:
+        + Can be accessed by anybody.
+
+    - Private members:
+        + Can only be accessed by member functions of the same class or by
+          friend functions.
+
+* Protected access specifier:
+    - Allows the class the member belongs to, friends and derived classes to
+      access the member.
+        + However, protected members are not accessible outside the class.
+
+    - Using this specifier is useful when:
+        + Deriving from classes written by myself or my team.
+        + And the number of derived classes is reasonable.
+
+* Different kinds of inheritance and their impact on access:
+    - There are three different ways of inheriting from other classes:
+        + private (default), protected and public.
+
+    - When members are inherited, the access specifiers for an inherited member
+      may be changed (in the derived class only) depending on the type of
+      inheritance used, i.e.,
+        + Public or protected members in the Base class may change access
+          specifiers in the derived class.
+
+    - Access specifiers and inheritance type combinations:
+
+        Access specifier    Access specifier when inherited:
+        in the Base class   publicly       privately      protectedly
+        =================   ============   ============   ============
+        public              public         private        protected
+        private             inaccessible   inaccessible   inaccessible
+        protected           protected      private        protected
+
+* Unless there are specific reasons, always prefer public inheritance!!!
+
+11.6 Adding, changing and hiding members in a derived class
+-----------------------------------------------------------
+
+*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
