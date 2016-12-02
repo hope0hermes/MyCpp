@@ -3041,12 +3041,243 @@ Chapter 11. Inheritance
 11.6 Adding, changing and hiding members in a derived class
 -----------------------------------------------------------
 
-*
+* Adding new functionality:
+    - Simply declare the desired new functionality in a Derived class.
 
+* Redefining functionality (hiding functions):
+    - When a member function is called with a derived class object, the
+      compiler:
+        + 1st looks to see if that member exist in the derived class.
+        + If not, looks for its existence within the inheritance chain, using
+          the 1st definition it finds.
 
+    - Functions can be made to work differently be redefining the in the derived
+      class.
+    - Functions redefined in the Derived class, do NOT inherit the access
+      specifiers of the functions with the same name in the Base class, i.e.,
+        + Private functions in the Base class can be redefined as public in the
+          Derived class and vice-versa.
 
+* Adding to existing functionality:
+    - It is possible to call a Base class function and ADD functionality to it,
+      instead of hiding it via redefinition.
+    - A Derived function can call a Base function with the same name, prefixing
+      it with the scope qualifier (i.e. name of the Base class followed by ::)
 
+    class Derived: public Base {
+    public:
+        Detived(int val=1) : Base{val} {}
+        void foo() {
+            // calling the Base function.
+            Base::foo();
+            // adding functionality.
+            std::cout << "This is the added functionality. Very useful\n";
+        }
+    };
 
+    - Tricky part. Calling friend functions of the base class:
+        + These functions are NOT part of the Base class.
+            : Therefore, using the scope resolution qualifier won't work.
+
+        + The trick is to make that the Derived class looks like the Base class
+          (temporary), so that the right version of the function is called.
+            : This can be done using static_cast.
+
+        class Base {
+        private:
+            int m_val;
+        public:
+            Base(int val) : m_var{val} {}
+            friend std::ostream& operator<< (std::ostream &out, const Base &b) {
+                out << "In Base\n";
+                out << b.m_var << '\n';
+                return out;
+            }
+        };
+        class Deriv: public Base {
+        public:
+            Deriv(int val) : Base(val) {}
+            friend std::ostream& operator<< (std::ostream *out, const Deriv &d){
+                out << "In Deriv\n";
+                // static_cast Derived to a Base object, so we call the right
+                // version of operator <<
+                out << static_cast<Base>(d);
+                return out;
+            }
+        };
+
+        + This works because Derived "IS-A" Base.   <- Polymorphism.
+
+* Changing an inherited member's access level:
+    - This is done using a "using declaration":
+        + This identifies the Base-class member which is having its identity
+          changed in the Derived class:
+
+        class Base {
+        private:
+            int m_var;
+        public:
+            Base(int val) : m_var{val} {}
+        protected:
+            // this function can only be called by Base or its Derived classes,
+            // but not the public.
+            void printValue() { cout << m_var; }
+        };
+
+        class Derive : public Base {
+        public:
+            Derived(int) : Base{val} {}
+            // Base::printValue was inherited as protected, so the public does
+            // not has access to it. But we will change that in a second, jeje.
+            using Base::printValue  // notice that there are not () here.
+        };
+
+        int main() {
+            Derived deriv(7);
+            // printValue is public in the derived class ;-)
+            derived.printValue();
+            return 0;
+        }
+
+    - It is only possible to change the access specifier of Base members the
+      derived class has access to.
+
+* Hiding functionality:
+    - In a Derived class it is possible to hide the functionality that exist in
+      the Base class, so that it can not be accessed through the Derived class.
+        + Simply changing (overriding) the relevant access specifier (in the
+          case of data) or using the delete keyword (for functions).
+        * Alternatively the Base class may be inherited as private.
+
+        class Base {
+        public:
+            int m_var;
+
+            Base(int val) : m_var{val} {}
+            void foo() { std::cout << "Waka\n"; }
+        };
+
+        class Derived : public Base {
+        private:
+            using Base::m_var;      // now m_var is private.
+        public c:
+            Derived() {}
+            void foo() = delete;    // mark this function as inaccessible.
+        };
+
+11.7 Multiple inheritance
+------------------------
+
+* Enables a derived class to inherit members from more than one parent.
+    + i.e., teacher may inherit from person and employee.
+
+* To use multiple inheritance, simply specify each Base class, separated by
+  comma:
+
+    class Teacher : public Person, public Employee {
+        // body of the class.
+    };
+
+* Problems with multiple inheritance:
+    - Ambiguity may result when multiple Base classes contain functions with the
+      same name.
+
+    - Diamond problem:
+        + Occurs when a class multiply inherits from two classes which, each,
+          inherit from a single Base class.
+        + The problem is soluble using explicit scoping, but this induces way
+          too much maintenance overhead.
+
+* It is a common belief that multiple inheritance should be avoided at all cost.
+
+Chapter 12. Virtual functions
+=============================
+
+12.1 Pointers and references to the base class of derived objects
+-----------------------------------------------------------------
+
+* Pointers, references and derived classes
+
+    class Ani {
+    protected:
+        std::string m_name;
+        Animal(std::string name) : m_name{name} {}
+    public:
+        std::string getName() { return m_name; }
+        const char* speak() { return "????"; }
+    };
+
+    class Cat : public {
+    public:
+        Cat(std::string name) : Animal{name} {}
+        const char* speak() { return "meow"; }
+    };
+
+    int main() {
+        Cat cat("tomas");
+
+        Cat &rCat = cat;    // reference to deriver object.
+        Cat &pCat = &cat;   // pointer to derived object.
+        Ani &rAni = cat;    // reference to base object.
+        Ani *pAni = &cat;   // pointer to base object.
+
+        std::cout<<rCat.getName()<<rCat.speak();    // Cat::speak => tomas meow
+        std::cout<<pCat->getName()<<pCat->speak();  // Cat::speak => tomas meow
+        std::cout<<rAni.getName()<<rAni.speaks();   // Ani::speak => tomas ????
+        std::cout<<pAni->getName()<<pAni->speaks(); // Ani::speak => tomas ????
+    }
+
+    - Abase pointer or reference is only able to call the base version of a
+      function, Not a derived version.
+
+12.2 Virtual functions and polymorphism
+---------------------------------------
+
+* Virtual function:
+    - Special type of function that, when called, resolves to the
+      most-derived version of the function that exist between the Base and
+      the Derived class.
+        + This capability is known as polymorphism.
+
+    - A Derived function is considered match if it has the same signature and
+      return type as the Base function.
+        + Such functions are called overrides.
+
+    - A function is made virtual by placing the keyword "virtual" before its
+      declaration.
+
+        class A {
+        public:
+            virtual const char* getName() { return "A"; }
+        };
+        class B : public A {
+        public:
+            virtual const char* getName() { return "B"; }
+        };
+        class C : public B {
+        public:
+            virtual const char* getName() { return "C"; }
+        };
+        int main() {
+            B b;
+            A &a = b;                   // reference to the A portion of B.
+            std::cout << a.getName();   // B::getName => "B"
+        }
+
+* Only the most Base-class function needs to be tagged as virtual for all the
+  Derived functions to work virtually.
+    - But having the keyword on the Derived functions does not hurt and serves
+      as a reminder.
+
+* Do NOT call virtual functions from constructors or destructors:
+    - The reason is that the Base part is created before the Derived one:
+        + Then, calling a virtual function in the constructor will use the Base
+          version, which is the only one that exits at calling time.
+
+* Resolving virtual function calls takes longer than resolving normal functions.
+
+12.2a The override and final specifiers, and covariant return types
+-------------------------------------------------------------------
 
 
 
